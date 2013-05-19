@@ -1,14 +1,14 @@
 ## Birdie
 
 Birdie is a fast, fine-grained static asset management tool.
-It intends to replace [https://github.com/bower/bower](bower) for common uses,
+It intends to replace [bower](https://github.com/bower/bower) for common uses,
 although it is not as flexible (but does have a certain flexibility that bower
 does not).
 
 Goals:
 
 * **Curated repository / database of resources.** More like
-  [https://github.com/mxcl/homebrew](homebrew) than [https://npmjs.org/](npm),
+  [homebrew](https://github.com/mxcl/homebrew) than [npm](https://npmjs.org/),
   in that it's not publically writable, and any changes are recorded in source
   control.
 * **Fast.** Does not clone the entire git repository (which often contains
@@ -127,8 +127,7 @@ Before you send a pull request, please verify that:
 
 1. Support git directly, rather than converting to `https://raw.github.com/...` for github
    and dying on everything else.
-
-   <!-- http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
+   <!-- * http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
 2. Add option not to overwrite existing files (or even fetch them).
    * Maybe even incorporating the file creation time as a `If-Modified-Since`
      header, and ignoring "304 Not Modified" responses.
