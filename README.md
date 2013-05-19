@@ -137,7 +137,9 @@ Before you send a pull request, please verify that:
    * Fall back to other urls if any of them error out with a 404 / 500.
 5. Add more libraries!
 
-<!-- http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
+<!-- 1. http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
+<!-- 1. http://schacon.github.io/git/git-read-tree.html#_sparse_checkout -->
+<!-- 5. https://github.com/chbrown/static-lib -->
 
 ## License
 
