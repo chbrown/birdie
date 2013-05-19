@@ -17,6 +17,7 @@
   "dependencies": {
     "async": "*",
     "glob": "*",
+    "mkdirp": "*",
     "optimist": "*",
     "request": "*",
     "semver": "*",
