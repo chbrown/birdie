@@ -9,7 +9,7 @@ Goals:
 
 * **Curated repository / database of resources.** More like
   [homebrew](https://github.com/mxcl/homebrew) than [npm](https://npmjs.org/),
-  in that it's not publically writable, and any changes are recorded in source
+  in that it's not publically writable, and all changes are recorded in source
   control.
 * **Fast.** Does not clone the entire git repository (which often contains
   tests, benchmarks, etc.), but only the files you (ought to) want.
@@ -127,7 +127,7 @@ Before you send a pull request, please verify that:
 
 1. Support git directly, rather than converting to `https://raw.github.com/...` for github
    and dying on everything else.
-   <!-- * http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
+   <!--- * http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
 2. Add option not to overwrite existing files (or even fetch them).
    * Maybe even incorporating the file creation time as a `If-Modified-Since`
      header, and ignoring "304 Not Modified" responses.
