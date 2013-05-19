@@ -127,7 +127,6 @@ Before you send a pull request, please verify that:
 
 1. Support git directly, rather than converting to `https://raw.github.com/...` for github
    and dying on everything else.
-   <!--- * http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
 2. Add option not to overwrite existing files (or even fetch them).
    * Maybe even incorporating the file creation time as a `If-Modified-Since`
      header, and ignoring "304 Not Modified" responses.
@@ -137,6 +136,8 @@ Before you send a pull request, please verify that:
    * Check that they're all the same.
    * Fall back to other urls if any of them error out with a 404 / 500.
 5. Add more libraries!
+
+<!-- http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
 
 ## License
 
