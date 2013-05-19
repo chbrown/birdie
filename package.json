@@ -1,6 +1,6 @@
 {
   "name": "birdie",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Static asset anti-package management.",
   "author": "Christopher Brown <io@henrian.com>",
   "homepage": "http://github.com/chbrown/birdie",
