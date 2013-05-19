@@ -42,7 +42,8 @@ function fetch(uri, callback) {
     callback(new Error(message));
   }
   else {
-    request(uri, function (err, response, body) {
+    // set encoding: null so that we get a buffer back as the body.
+    request({uri: uri, encoding: null}, function (err, response, body) {
       if (err) {
         callback(err);
       }
