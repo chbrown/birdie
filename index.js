@@ -65,7 +65,6 @@ function downloadFiles(pattern, filename_urls, done) {
     var url = urls[0];
     fetch(url, function(err, data) {
       if (err) {
-        logger.error(err.toString());
         callback(err);
       }
       else {
