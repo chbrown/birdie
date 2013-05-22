@@ -8,15 +8,19 @@ module.exports = function(version, callback) {
   var cloudflare = cdn.cloudflare('twitter-bootstrap')(version);
   var bootstrapcdn = cdn.http('netdna.bootstrapcdn.com/twitter-bootstrap')(version);
 
+  // bootstrap.css expects glyphicons at ../img/glyphicons-halflings.png
+  // despite this being reasonable, this unfortunately means we have to
+  // broach the usual flat directory structure policy and put both css/
+  // and img/ things in subfolders
   var files = {
-    'bootstrap-responsive.css': 'css/bootstrap-responsive.css',
-    'bootstrap-responsive.min.css': 'css/bootstrap-responsive.min.css',
-    'bootstrap.css': 'css/bootstrap.css',
-    'bootstrap.min.css': 'css/bootstrap.min.css',
+    'css/bootstrap-responsive.css': 'css/bootstrap-responsive.css',
+    'css/bootstrap-responsive.min.css': 'css/bootstrap-responsive.min.css',
+    'css/bootstrap.css': 'css/bootstrap.css',
+    'css/bootstrap.min.css': 'css/bootstrap.min.css',
     'bootstrap.js': 'js/bootstrap.js',
     'bootstrap.min.js': 'js/bootstrap.min.js',
-    'glyphicons-halflings-white.png': 'img/glyphicons-halflings-white.png',
-    'glyphicons-halflings.png': 'img/glyphicons-halflings.png'
+    'img/glyphicons-halflings-white.png': 'img/glyphicons-halflings-white.png',
+    'img/glyphicons-halflings.png': 'img/glyphicons-halflings.png'
   };
 
   var filename_urls = {};
