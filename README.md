@@ -136,6 +136,14 @@ Before you send a pull request, please verify that:
    * Check that they're all the same.
    * Fall back to other urls if any of them error out with a 404 / 500.
 5. Add more libraries!
+   - d3
+   - date.js
+   - head.js
+   - lesscss
+   - mousetrap
+   - jquery.fileupload
+   - [js-url](https://github.com/websanova/js-url)
+   - jquery.mustache
 
 <!-- 1. http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
 <!-- 1. http://schacon.github.io/git/git-read-tree.html#_sparse_checkout -->

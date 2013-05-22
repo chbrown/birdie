@@ -27,6 +27,7 @@
     "optimist": "*",
     "request": "*",
     "semver": "*",
+    "temp": "*",
     "underscore": "*",
     "winston": "*"
   },

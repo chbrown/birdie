@@ -1,17 +1,38 @@
 #!/usr/bin/env node
 'use strict'; /*jslint node: true, indent: 2, vars: true, es5: true */
-var fs = require('fs');
-var path = require('path');
-// var semver = require('semver');
-var optimist = require('optimist');
 var async = require('async');
-var request = require('request');
+var child_process = require('child_process');
+var fs = require('fs');
+var glob = require('glob');
 var logger = require('winston');
 var mkdirp = require('mkdirp');
+var optimist = require('optimist');
+var path = require('path');
+var request = require('request');
+var temp = require('temp');
 
 var config_filename = 'package.json';
 var default_pattern = 'static/{resource}/{file}';
 
+function copyFile(srcpath, dstpath, callback) {
+  var dirpath = path.dirname(dstpath);
+  mkdirp(dirpath, function(err) {
+    if (err) {
+      callback(err);
+    }
+    else {
+      fs.unlink(dstpath, function(err) {
+        if (err && err.code != 'ENOENT') {
+          // ignore error if the file doesn't already exist
+          callback(err);
+        }
+        else {
+          fs.link(srcpath, dstpath, callback);
+        }
+      });
+    }
+  });
+}
 
 function writeFile(filepath, data, callback) {
   // callback signature: function(err)
@@ -48,7 +69,7 @@ function fetch(uri, callback) {
         callback(err);
       }
       else if (response.statusCode != 200) {
-        callback(new Error("HTTP " + response.statusCode + ' ' + uri), body);
+        callback(new Error('HTTP ' + response.statusCode + ' ' + uri), body);
       }
       else {
         callback(null, body);
@@ -79,17 +100,59 @@ function downloadFiles(pattern, filename_urls, done) {
   }, done);
 }
 
+function gitClone(pattern, git_url, callback) {
+  // callback signature: function(err)
+  // temp.mkdir('birdie-git', function(err, path) { console.log(err, path) });
+  temp.mkdir(null, function(err, git_dir) {
+    logger.debug('git clone ' + git_url + ' ' + git_dir);
+    child_process.spawn('git', ['clone', git_url, git_dir])
+    .on('close', function (code) {
+      // for each file in the git dir, besides .git/**, copy it as file
+      if (code !== 0) {
+        logger.error('git clone exited with code ' + code);
+      }
+      glob('**', {cwd: git_dir, mark: true}, function(err, matches) {
+        // filter off the empty string for the root directory
+        var files = matches.filter(function(m) { return !m.match(/\/$/); });
+        // files is a list of partial filepaths (i.e., files in directories, but not absolute)
+        async.each(files, function(file, callback) {
+          var temppath = path.join(git_dir, file);
+          var filepath = pattern.replace(/\{file\}/g, file);
+          copyFile(temppath, filepath, function(err) {
+            if (!err)
+              logger.info(filepath + ' < ' + git_url + '/' + file);
+            callback(err);
+          });
+        }, callback);
+      });
+    });
+  });
+}
+
 function downloadResources(pattern, resources) {
   // console.log('downloadResources', destination, resources);
   async.each(Object.keys(resources), function (resource_name, callback) {
     var version = resources[resource_name];
     logger.info(resource_name + ' version: ' + version);
-    // we sort of curry the pattern as we go along.
+    // we partially fill the pattern as we go along.
     var resource_pattern = pattern.replace(/\{resource\}/g, resource_name);
-    require('./resources/' + resource_name)(version, function(err, filename_urls) {
-      // filename_urls is a dictionary from filenames to lists of urls
-      downloadFiles(resource_pattern, filename_urls, callback);
-    });
+
+    if (version.match(/^git:/)) {
+      gitClone(resource_pattern, version, callback);
+    }
+    else {
+      try {
+        var resource_module = require('./resources/' + resource_name);
+        resource_module(version, function(err, filename_urls) {
+          // filename_urls is a dictionary from filenames to lists of urls
+          downloadFiles(resource_pattern, filename_urls, callback);
+        });
+      }
+      catch (exc) {
+        // if the resource does not exist (no module there)
+        callback(exc);
+      }
+    }
   }, function(err) {
     if (err) {
       logger.error(err.toString());
@@ -169,6 +232,10 @@ if (require.main === module) {
         throw new Error('Invalid command: ' + command);
     })
     .argv;
+
+  if (argv.verbose) {
+    logger.level = 'debug';
+  }
 
   var command = argv._[0];
   commands[command](argv);
