@@ -11,7 +11,7 @@ module.exports = function(version, callback) {
   // bootstrap.css expects glyphicons at ../img/glyphicons-halflings.png
   // despite this being reasonable, this unfortunately means we have to
   // broach the usual flat directory structure policy and put both css/
-  // and img/ things in subfolders
+  // and img/ resources in subfolders
   var files = {
     'css/bootstrap-responsive.css': 'css/bootstrap-responsive.css',
     'css/bootstrap-responsive.min.css': 'css/bootstrap-responsive.min.css',

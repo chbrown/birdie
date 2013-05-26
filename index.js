@@ -102,7 +102,6 @@ function downloadFiles(pattern, filename_urls, done) {
 
 function gitClone(pattern, git_url, callback) {
   // callback signature: function(err)
-  // temp.mkdir('birdie-git', function(err, path) { console.log(err, path) });
   temp.mkdir(null, function(err, git_dir) {
     logger.debug('git clone ' + git_url + ' ' + git_dir);
     child_process.spawn('git', ['clone', git_url, git_dir])
