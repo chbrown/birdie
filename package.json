@@ -11,6 +11,7 @@
     "client-side",
     "curated"
   ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/chbrown/birdie.git"

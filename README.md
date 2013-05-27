@@ -151,6 +151,4 @@ Before you send a pull request, please verify that:
 
 ## License
 
-Copyright 2013 Christopher Brown
-
-MIT Licensed
+Copyright © 2013 Christopher Brown. [MIT Licensed](LICENSE).
