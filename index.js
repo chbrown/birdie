@@ -232,7 +232,8 @@ var commands = {
     var resources_glob = query ? ('*' + query + '*.js') : '*.js';
     glob(resources_glob, {cwd: resources_path, nocase: true}, function(err, resource_names) {
       if (err) logger.error(err);
-      async.each(resource_names, function(resource_name, callback) {
+      async.each(resource_names, function(resource_js, callback) {
+        var resource_name = resource_js.replace(/\.js$/, '');
         var resource_module = require('./resources/' + resource_name);
         resource_module('*', function(err, filename_urls) {
           // filename_urls is a dictionary from filenames to lists of urls
