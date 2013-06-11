@@ -1,6 +1,6 @@
 {
   "name": "birdy",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Static asset anti-package management.",
   "author": "Christopher Brown <io@henrian.com>",
   "homepage": "http://github.com/chbrown/birdy",
