@@ -1,6 +1,6 @@
-## Birdie
+## Birdy
 
-Birdie is a fast, fine-grained static asset management tool.
+Birdy is a fast, fine-grained static asset management tool.
 It intends to replace [bower](https://github.com/bower/bower) for common uses,
 although it is not as flexible (but does have a certain flexibility that bower
 does not).
@@ -21,13 +21,13 @@ Goals:
 
 ### Getting started
 
-First, install Birdie
+First, install Birdy
 
-    npm install -g birdie
+    npm install -g birdy
 
 You'll need to add a section to your `package.json`, or a `package.json` file to your project, if you don't node.
 
-    birdie init
+    birdy init
 
 Add resources to the newly created "staticDependencies" hash in your `package.json` file as needed, something like:
 
@@ -50,7 +50,7 @@ You can also specify in your `package.json` where the files go:
     }
 
 `staticPattern` is resolved relative to your current working directory where
-you happen to run `birdie install`, and all necessary directories will be created.
+you happen to run `birdy install`, and all necessary directories will be created.
 
 It has two special values, which are replaced as the script proceeds.
 
@@ -67,23 +67,19 @@ Or if you want everything in one directory:
     { "staticPattern": "static/{file}" }
 
 Most filenames denote their resource, but not specifying `{resource}` might
-end up overwriting some files. `birdie install` will not inform you of such
+end up overwriting some files. `birdy install` will not inform you of such
 conflicts, so be careful.
 
 Then fetch them!
 
-    birdie install
+    birdy install
 
 ### Command line options
 
 You can specify all these options at the command line, instead of `package.json`.
 But I led with `package.json` because that's the sane way.
 
-Run `birdie --help` to see what flags to use.
-
-### Over the top
-
-Birdie also aliases the main script to `birdy`, so `birdie ...` and `birdy ...` do exactly the same thing.
+Run `birdy --help` to see what flags to use.
 
 ## resources/*
 
@@ -130,7 +126,7 @@ Before you send a pull request, please verify that:
 2. Add option not to overwrite existing files (or even fetch them).
    * Maybe even incorporating the file creation time as a `If-Modified-Since`
      header, and ignoring "304 Not Modified" responses.
-3. Cache locally like `bower` does, something like `~/.birdie`?
+3. Cache locally like `bower` does, something like `~/.birdy/`?
 4. Use multiple urls when available. Ideas:
    * Randomize which url gets picked.
    * Check that they're all the same.

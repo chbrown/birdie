@@ -1,9 +1,9 @@
 {
-  "name": "birdie",
+  "name": "birdy",
   "version": "0.2.1",
   "description": "Static asset anti-package management.",
   "author": "Christopher Brown <io@henrian.com>",
-  "homepage": "http://github.com/chbrown/birdie",
+  "homepage": "http://github.com/chbrown/birdy",
   "keywords": [
     "static",
     "asset",
@@ -14,10 +14,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/chbrown/birdie.git"
+    "url": "git://github.com/chbrown/birdy.git"
   },
   "bin": {
-    "birdie": "index.js",
     "birdy": "index.js"
   },
   "main": "index.js",
