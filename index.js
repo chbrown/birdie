@@ -1,18 +1,23 @@
 #!/usr/bin/env node
-'use strict'; /*jslint node: true, indent: 2, vars: true, es5: true */
+'use strict'; /*jslint node: true, es5: true, indent: 2 */
 var async = require('async');
 var child_process = require('child_process');
 var fs = require('fs');
 var glob = require('glob');
 var logger = require('winston');
 var mkdirp = require('mkdirp');
-var optimist = require('optimist');
 var path = require('path');
 var request = require('request');
 var temp = require('temp');
 
-var config_filename = 'package.json';
-var default_pattern = 'static/{resource}/{file}';
+function parseJSON(s) {
+  try {
+    return JSON.parse(s);
+  }
+  catch (exc) {
+    return exc;
+  }
+}
 
 function copyFile(srcpath, dstpath, callback) {
   var dirpath = path.dirname(dstpath);
@@ -167,30 +172,37 @@ var commands = {
     var package_strings = argv._.slice(1);
     fs.readFile(config_filename, function (err, data) {
       if (err) {
-        if (err.code == 'ENOENT')
-          logger.info('Creating new package.json');
-        else
+        if (err.code == 'ENOENT') {
+          logger.info('Creating new ' + config_filename);
+        }
+        else {
           logger.error(err);
+        }
       }
 
-      var package_json = JSON.parse(data || '{}');
-      var resources = package_json.staticDependencies || {};
+      var package_json = parseJSON(data);
+      if (package_json instanceof Error) {
+        logger.error('Could not parse ' + config_filename + ', "' + data + '". Error: ' + package_json.toString());
+      }
+      else {
+        var resources = package_json.staticDependencies || {};
 
-      package_strings.forEach(function(package_string) {
-        var parts = package_string.split(/==?/);
-        // 1) if a particular version is specified, use that.
-        // or 2) if there is already a version specified in the package.json, use
-        // it instead. 3) default to '*' in all other cases
-        resources[parts[0]] = parts[1] || resources[parts[0]] || '*';
-      });
+        package_strings.forEach(function(package_string) {
+          var parts = package_string.split(/==?/);
+          // 1) if a particular version is specified, use that.
+          // or 2) if there is already a version specified in the package.json, use
+          // it instead. 3) default to '*' in all other cases
+          resources[parts[0]] = parts[1] || resources[parts[0]] || '*';
+        });
 
-      package_json.staticDependencies = resources;
-      fs.writeFile(config_filename, JSON.stringify(package_json, null, '  '), function (err) {
-        if (err)
-          logger.error(err);
-        else
-          logger.info('Saved package.json');
-      });
+        package_json.staticDependencies = resources;
+        fs.writeFile(config_filename, JSON.stringify(package_json, null, '  '), function (err) {
+          if (err)
+            logger.error(err);
+          else
+            logger.info('Saved package.json');
+        });
+      }
     });
   },
   install: function(argv) {
@@ -212,9 +224,10 @@ var commands = {
 };
 
 if (require.main === module) {
-  var argv = optimist
+  var argv = require('optimist')
     .usage([
-      'Install external resources locally. Commands:',
+      '',
+      'Usage: $0 <command>',
       '',
       '  init [jquery==2.0.0] [backbone]',
       '    create package.json or add "staticDependencies" hash to it,',
@@ -223,20 +236,20 @@ if (require.main === module) {
       '  install [--pattern=static/{resource}/{file}] [jquery] [underscore]',
       '    fetch the packages specified in "staticDependencies" in your',
       '    package.json, as well as at the command line, and install them',
-      '    into the specified folder.'
+      '    into the specified folder.',
     ].join('\n'))
+    .default({
+      config: 'package.json',
+      pattern: 'static/{resource}/{file}',
+    })
+    .boolean(['help', 'verbose'])
     .check(function(argv) {
-      var command = argv._[0];
-      if (!commands[command])
-        throw new Error('Invalid command: ' + command);
+      if (argv.help || commands[argv._[0]] === undefined)
+        throw new Error('You must specify a command.');
     })
     .argv;
 
-  if (argv.verbose) {
-    logger.level = 'debug';
-  }
-
-  var command = argv._[0];
-  commands[command](argv);
+  logger.level = argv.verbose ? 'debug' : 'info';
+  commands[argv._[0]](argv);
 }
 
