@@ -10,6 +10,10 @@ var path = require('path');
 var request = require('request');
 var temp = require('temp');
 
+// default_staticPattern must not be an optimist default so that we have the order of priority:
+// argv.pattern || package_json.staticPattern || default_staticPattern;
+var default_staticPattern = 'static/{resource}/{file}';
+
 function parseJSON(s) {
   try {
     return JSON.parse(s);
@@ -170,10 +174,10 @@ function downloadResources(pattern, resources) {
 var commands = {
   init: function(argv) {
     var package_strings = argv._.slice(1);
-    fs.readFile(config_filename, function (err, data) {
+    fs.readFile(argv.config, function (err, data) {
       if (err) {
         if (err.code == 'ENOENT') {
-          logger.info('Creating new ' + config_filename);
+          logger.info('Creating new ' + argv.config);
         }
         else {
           logger.error(err);
@@ -182,11 +186,11 @@ var commands = {
 
       var package_json = parseJSON(data);
       if (package_json instanceof Error) {
-        logger.error('Could not parse ' + config_filename + ', "' + data + '". Error: ' + package_json.toString());
+        logger.error('Could not parse ' + argv.config + ', "' + data + '". ' +
+          'Error: ' + package_json.toString());
       }
       else {
         var resources = package_json.staticDependencies || {};
-
         package_strings.forEach(function(package_string) {
           var parts = package_string.split(/==?/);
           // 1) if a particular version is specified, use that.
@@ -196,7 +200,8 @@ var commands = {
         });
 
         package_json.staticDependencies = resources;
-        fs.writeFile(config_filename, JSON.stringify(package_json, null, '  '), function (err) {
+        package_json.staticPattern = package_json.staticPattern || argv.pattern || default_staticPattern;
+        fs.writeFile(argv.config, JSON.stringify(package_json, null, '  '), function (err) {
           if (err)
             logger.error(err);
           else
@@ -206,9 +211,9 @@ var commands = {
     });
   },
   install: function(argv) {
-    fs.readFile(config_filename, function (err, data) {
+    fs.readFile(argv.config, function (err, data) {
       var package_json = JSON.parse(data || '{}');
-      var pattern = argv.pattern || package_json.staticPattern || default_pattern;
+      var pattern = argv.pattern || package_json.staticPattern || default_staticPattern;
       var resources = package_json.staticDependencies || {};
 
       // the first argument was the command. the others are packages
@@ -220,27 +225,55 @@ var commands = {
 
       downloadResources(pattern, resources);
     });
-  }
+  },
+  search: function(argv) {
+    var query = argv._.slice(1).join(' ');
+    var resources_path = path.normalize(path.join(__dirname, 'resources'));
+    var resources_glob = query ? ('*' + query + '*.js') : '*.js';
+    glob(resources_glob, {cwd: resources_path, nocase: true}, function(err, resource_names) {
+      if (err) logger.error(err);
+      async.each(resource_names, function(resource_name, callback) {
+        var resource_module = require('./resources/' + resource_name);
+        resource_module('*', function(err, filename_urls) {
+          // filename_urls is a dictionary from filenames to lists of urls
+          console.log(resource_name + ':');
+          for (var filename in filename_urls) {
+            var urls = filename_urls[filename];
+            var line = '  - ' + filename;
+            if (argv.verbose) {
+              line += ' [' + urls[0] + ', ...]';
+            }
+            console.log(line);
+          }
+          callback(err);
+        });
+      }, function(err) {
+        logger.debug('Done searching.');
+      });
+    });
+  },
 };
 
 if (require.main === module) {
   var argv = require('optimist')
     .usage([
       '',
-      'Usage: $0 <command>',
+      'Usage: $0 <command> [--pattern=static/{resource}/{file}]',
       '',
       '  init [jquery==2.0.0] [backbone]',
       '    create package.json or add "staticDependencies" hash to it,',
       '    prefilled with the given packages',
       '',
-      '  install [--pattern=static/{resource}/{file}] [jquery] [underscore]',
+      '  install [jquery] [underscore]',
       '    fetch the packages specified in "staticDependencies" in your',
       '    package.json, as well as at the command line, and install them',
       '    into the specified folder.',
+      '',
+      '  search [query]',
+      '    list available resources (filtering by query, if specified)',
     ].join('\n'))
     .default({
-      config: 'package.json',
-      pattern: 'static/{resource}/{file}',
+      config: 'package.json'
     })
     .boolean(['help', 'verbose'])
     .check(function(argv) {
@@ -250,6 +283,6 @@ if (require.main === module) {
     .argv;
 
   logger.level = argv.verbose ? 'debug' : 'info';
-  commands[argv._[0]](argv);
+  var command = argv._[0];
+  commands[command](argv);
 }
-
