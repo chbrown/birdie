@@ -259,7 +259,7 @@ if (require.main === module) {
   var argv = require('optimist')
     .usage([
       '',
-      'Usage: $0 <command> [--pattern=static/{resource}/{file}]',
+      'Usage: birdy <command> [--pattern=static/{resource}/{file}]',
       '',
       '  init [jquery==2.0.0] [backbone]',
       '    create package.json or add "staticDependencies" hash to it,',
