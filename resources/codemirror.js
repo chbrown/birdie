@@ -6,7 +6,7 @@ module.exports = function(version, callback) {
     '2.14', '2.13', '2.12', '2.11', '2.1', '2.02', '2.01', '2.0', '2', '1'];
   version = {'*': '3.12'}[version] || version;
   if (versions.indexOf(version) < 0)
-    console.error("That version is not officially supported.");
+    console.error('That version is not officially supported.');
 
   // cloudflare actually only has 3.12.0 and 2.36.0
   var cloudflare = cdn.cloudflare('codemirror')(version + '.0');

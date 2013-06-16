@@ -8,7 +8,7 @@ module.exports = function(version, callback) {
     '1.5.3', '1.5.2'];
   version = {'*': '1.10.3'}[version] || version;
   if (versions.indexOf(version) < 0)
-    console.error("That version is not officially supported.");
+    console.error('That version is not officially supported.');
 
   var cloudflare = cdn.cloudflare('jqueryui')(version);
   var google = cdn.google('jqueryui')(version);

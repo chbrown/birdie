@@ -5,7 +5,7 @@ module.exports = function(version, callback) {
     '1.4.3', '1.4.2', '1.4.1', '1.3.2', '1.3.1', '1.3.0', '1.2.6', '1.2.3'];
   version = {'*': '1.9.1'}[version] || version;
   if (versions.indexOf(version) < 0)
-    console.error("That version is not officially supported.");
+    console.error('That version is not officially supported.');
 
   var cloudflare = cdn.cloudflare('jquery')(version);
   var google = cdn.google('jquery')(version);

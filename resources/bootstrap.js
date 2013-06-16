@@ -3,7 +3,7 @@ module.exports = function(version, callback) {
   var versions = ['2.3.2', '2.3.1'];
   version = {'*': '2.3.1'}[version] || version;
   if (versions.indexOf(version) < 0)
-    console.error("That version is not officially supported.");
+    console.error('That version is not officially supported.');
 
   var cloudflare = cdn.cloudflare('twitter-bootstrap')(version);
   var bootstrapcdn = cdn.http('netdna.bootstrapcdn.com/twitter-bootstrap')(version);

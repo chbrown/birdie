@@ -9,7 +9,7 @@ module.exports = function(version, callback) {
     '0.3.0', '0.2.0', '0.1.1', '0.1.0'];
   version = {'*': '1.4.4'}[version] || version;
   if (versions.indexOf(version) < 0)
-    console.error("That version is not officially supported.");
+    console.error('That version is not officially supported.');
 
   var cloudflare = cdn.cloudflare('underscore.js')(version);
   var github = cdn.github('documentcloud/underscore')(version);
