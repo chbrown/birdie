@@ -14,6 +14,12 @@ var temp = require('temp');
 // argv.pattern || package_json.staticPattern || default_staticPattern;
 var default_staticPattern = 'static/{resource}/{file}';
 
+function fatal(err, exit_code) {
+  if (exit_code === undefined) exit_code = 1;
+  logger.error(err);
+  process.exit(1);
+}
+
 function parseJSON(s) {
   try {
     return JSON.parse(s);
@@ -175,39 +181,39 @@ var commands = {
   init: function(argv) {
     var package_strings = argv._.slice(1);
     fs.readFile(argv.config, function (err, data) {
-      if (err) {
-        if (err.code == 'ENOENT') {
-          logger.info('Creating new ' + argv.config);
-        }
-        else {
-          logger.error(err);
-        }
+      if (err && err.code != 'ENOENT') {
+        throw err;
       }
 
-      var package_json = parseJSON(data);
-      if (package_json instanceof Error) {
-        logger.error('Could not parse ' + argv.config + ', "' + data + '". ' +
-          'Error: ' + package_json.toString());
+      var package_json = {};
+      if (err && err.code == 'ENOENT') {
+        logger.info('Creating new ' + argv.config);
       }
       else {
-        var resources = package_json.staticDependencies || {};
-        package_strings.forEach(function(package_string) {
-          var parts = package_string.split(/==?/);
-          // 1) if a particular version is specified, use that.
-          // or 2) if there is already a version specified in the package.json, use
-          // it instead. 3) default to '*' in all other cases
-          resources[parts[0]] = parts[1] || resources[parts[0]] || '*';
-        });
-
-        package_json.staticDependencies = resources;
-        package_json.staticPattern = package_json.staticPattern || argv.pattern || default_staticPattern;
-        fs.writeFile(argv.config, JSON.stringify(package_json, null, '  '), function (err) {
-          if (err)
-            logger.error(err);
-          else
-            logger.info('Saved package.json');
-        });
+        package_json = parseJSON(data);
+        if (package_json instanceof Error) {
+          logger.error('Could not parse ' + argv.config + ', "' + data + '". ' +
+            'Error: ' + package_json.toString());
+        }
       }
+
+      var resources = package_json.staticDependencies || {};
+      package_strings.forEach(function(package_string) {
+        var parts = package_string.split(/==?/);
+        // 1) if a particular version is specified, use that.
+        // or 2) if there is already a version specified in the package.json, use
+        // it instead. 3) default to '*' in all other cases
+        resources[parts[0]] = parts[1] || resources[parts[0]] || '*';
+      });
+
+      package_json.staticDependencies = resources;
+      package_json.staticPattern = package_json.staticPattern || argv.pattern || default_staticPattern;
+      fs.writeFile(argv.config, JSON.stringify(package_json, null, '  '), function (err) {
+        if (err)
+          logger.error(err);
+        else
+          logger.info('Saved package.json');
+      });
     });
   },
   install: function(argv) {
