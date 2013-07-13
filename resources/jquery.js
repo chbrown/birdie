@@ -1,8 +1,11 @@
 var cdn = require('../cdn');
+// http://blog.jquery.com/
 module.exports = function(version, callback) {
   var versions = [
+    '2.0.3',
     '2.0.2',
     '2.0.0',
+    '1.10.2',
     '1.10.1',
     '1.9.1',
     '1.9.0',
@@ -25,7 +28,7 @@ module.exports = function(version, callback) {
     '1.3.0',
     '1.2.6',
     '1.2.3'];
-  version = {'*': '1.10.1'}[version] || version;
+  version = {'*': '1.10.2'}[version] || version;
   if (versions.indexOf(version) < 0)
     console.error('That version is not officially supported.');
 
