@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 'use strict'; /*jslint node: true, es5: true, indent: 2 */
 var async = require('async');
 var child_process = require('child_process');
@@ -10,26 +9,16 @@ var path = require('path');
 var request = require('request');
 var temp = require('temp');
 
-// default_staticPattern must not be an optimist default so that we have the order of priority:
-// argv.pattern || package_json.staticPattern || default_staticPattern;
-var default_staticPattern = 'static/{resource}/{file}';
+var defaults = exports.defaults = {
+  staticPattern: 'static/{resource}/{file}',
+  staticDependencies: {}
+};
 
-function fatal(err, exit_code) {
-  if (exit_code === undefined) exit_code = 1;
-  logger.error(err);
-  process.exit(1);
-}
+var copyFile = exports.copyFile = function(srcpath, dstpath, callback) {
+  /** copy the file at `srcpath` to `dstpath`, removing the file at `dstpath`
+    if it exists, and creating directories up to `dstpath` if needed.
 
-function parseJSON(s) {
-  try {
-    return JSON.parse(s);
-  }
-  catch (exc) {
-    return exc;
-  }
-}
-
-function copyFile(srcpath, dstpath, callback) {
+    `callback` signature: function(err) */
   var dirpath = path.dirname(dstpath);
   mkdirp(dirpath, function(err) {
     if (err) {
@@ -47,25 +36,30 @@ function copyFile(srcpath, dstpath, callback) {
       });
     }
   });
-}
+};
 
-function writeFile(filepath, data, callback) {
-  // callback signature: function(err)
-  // given a full filepath, create all required directories
-  // but we don't recursively create the directory
-  // fs.mkdir callback signature: function(err)
+var writeFile = exports.writeFile = function(filepath, data, callback) {
+  /** create any required directories up to `filepath`, and write data to
+    `filepath` with the default encoding.
+
+    `callback` signature: function(err) */
   var dirpath = path.dirname(filepath);
   mkdirp(dirpath, function(err) {
-    if (err)
+    if (err) {
       callback(err);
-    else
+    }
+    else {
       fs.writeFile(filepath, data, callback);
+    }
   });
-}
+};
 
-function fetch(uri, callback) {
-  // callback signature: function(err, data)
+var fetch = exports.fetch = function(uri, callback) {
+  /** fetch the given `uri` based on its protocol, redirecting to the github
+    raw url for git:// uri's, raising an error for other git:// urls, and
+    simply retrieving the content from http: and https: urls as a buffer.
 
+    `callback` signature: function(err, data) */
   if (uri.match(/^git:\/\/github.com/)) {
     // github is really nice in that it exposes all files on all branches/tags
     // over http and https at unique urls. so great!
@@ -84,17 +78,22 @@ function fetch(uri, callback) {
         callback(err);
       }
       else if (response.statusCode != 200) {
-        callback(new Error('HTTP ' + response.statusCode + ' ' + uri), body);
+        var message = 'HTTP ' + response.statusCode + ' ' + uri;
+        callback(new Error(message), body);
       }
       else {
         callback(null, body);
       }
     });
   }
-}
+};
 
-function downloadFiles(pattern, filename_urls, done) {
-  // `done` callback signature: function(err)
+var downloadFiles = exports.downloadFiles = function(filename_urls, pattern, done) {
+  /** download all files and save them to the local filesystem using the given
+    pattern. `filename_urls` is a hash from filenames to a list of urls, each
+    of which _should_ respond with the same content.
+
+    `done` signature: function(err) */
   async.each(Object.keys(filename_urls), function(filename, callback) {
     var urls = filename_urls[filename];
     // just use the first url, for now
@@ -113,9 +112,9 @@ function downloadFiles(pattern, filename_urls, done) {
       }
     });
   }, done);
-}
+};
 
-function gitClone(pattern, git_url, callback) {
+var gitClone = exports.gitClone = function(pattern, git_url, callback) {
   // callback signature: function(err)
   temp.mkdir(null, function(err, git_dir) {
     logger.debug('git clone ' + git_url + ' ' + git_dir);
@@ -141,13 +140,14 @@ function gitClone(pattern, git_url, callback) {
       });
     });
   });
-}
+};
 
-function downloadResources(pattern, resources) {
-  // console.log('downloadResources', destination, resources);
+var downloadResources = exports.downloadResources = function(pattern, resources, done) {
   async.each(Object.keys(resources), function (resource_name, callback) {
+    logger.debug('Downloading resource: %s', resource_name);
     var version = resources[resource_name];
     logger.info(resource_name + ' version: ' + version);
+
     // we partially fill the pattern as we go along.
     var resource_pattern = pattern.replace(/\{resource\}/g, resource_name);
 
@@ -159,7 +159,7 @@ function downloadResources(pattern, resources) {
         var resource_module = require('./resources/' + resource_name);
         resource_module(version, function(err, filename_urls) {
           // filename_urls is a dictionary from filenames to lists of urls
-          downloadFiles(resource_pattern, filename_urls, callback);
+          downloadFiles(filename_urls, resource_pattern, callback);
         });
       }
       catch (exc) {
@@ -175,121 +175,4 @@ function downloadResources(pattern, resources) {
       logger.info('Installed');
     }
   });
-}
-
-var commands = {
-  init: function(argv) {
-    var package_strings = argv._.slice(1);
-    fs.readFile(argv.config, function (err, data) {
-      if (err && err.code != 'ENOENT') {
-        throw err;
-      }
-
-      var package_json = {};
-      if (err && err.code == 'ENOENT') {
-        logger.info('Creating new ' + argv.config);
-      }
-      else {
-        package_json = parseJSON(data);
-        if (package_json instanceof Error) {
-          logger.error('Could not parse ' + argv.config + ', "' + data + '". ' +
-            'Error: ' + package_json.toString());
-        }
-      }
-
-      var resources = package_json.staticDependencies || {};
-      package_strings.forEach(function(package_string) {
-        var parts = package_string.split(/==?/);
-        // 1) if a particular version is specified, use that.
-        // or 2) if there is already a version specified in the package.json, use
-        // it instead. 3) default to '*' in all other cases
-        resources[parts[0]] = parts[1] || resources[parts[0]] || '*';
-      });
-
-      package_json.staticDependencies = resources;
-      package_json.staticPattern = package_json.staticPattern || argv.pattern || default_staticPattern;
-      fs.writeFile(argv.config, JSON.stringify(package_json, null, '  '), function (err) {
-        if (err)
-          logger.error(err);
-        else
-          logger.info('Saved package.json');
-      });
-    });
-  },
-  install: function(argv) {
-    fs.readFile(argv.config, function (err, data) {
-      var package_json = JSON.parse(data || '{}');
-      var pattern = argv.pattern || package_json.staticPattern || default_staticPattern;
-      var resources = package_json.staticDependencies || {};
-
-      // the first argument was the command. the others are packages
-      var package_strings = argv._.slice(1);
-      package_strings.forEach(function(package_string) {
-        var parts = package_string.split(/==?/);
-        resources[parts[0]] = parts[1] || resources[parts[0]] || '*';
-      });
-
-      downloadResources(pattern, resources);
-    });
-  },
-  search: function(argv) {
-    var query = argv._.slice(1).join(' ');
-    var resources_path = path.normalize(path.join(__dirname, 'resources'));
-    var resources_glob = query ? ('*' + query + '*.js') : '*.js';
-    glob(resources_glob, {cwd: resources_path, nocase: true}, function(err, resource_names) {
-      if (err) logger.error(err);
-      async.each(resource_names, function(resource_js, callback) {
-        var resource_name = resource_js.replace(/\.js$/, '');
-        var resource_module = require('./resources/' + resource_name);
-        resource_module('*', function(err, filename_urls) {
-          // filename_urls is a dictionary from filenames to lists of urls
-          console.log(resource_name + ':');
-          for (var filename in filename_urls) {
-            var urls = filename_urls[filename];
-            var line = '  - ' + filename;
-            if (argv.verbose) {
-              line += ' [' + urls[0] + ', ...]';
-            }
-            console.log(line);
-          }
-          callback(err);
-        });
-      }, function(err) {
-        logger.debug('Done searching.');
-      });
-    });
-  },
 };
-
-if (require.main === module) {
-  var argv = require('optimist')
-    .usage([
-      '',
-      'Usage: birdy <command> [--pattern=static/{resource}/{file}]',
-      '',
-      '  init [jquery==2.0.0] [backbone]',
-      '    create package.json or add "staticDependencies" hash to it,',
-      '    prefilled with the given packages',
-      '',
-      '  install [jquery] [underscore]',
-      '    fetch the packages specified in "staticDependencies" in your',
-      '    package.json, as well as at the command line, and install them',
-      '    into the specified folder.',
-      '',
-      '  search [query]',
-      '    list available resources (filtering by query, if specified)',
-    ].join('\n'))
-    .default({
-      config: 'package.json'
-    })
-    .boolean(['help', 'verbose'])
-    .check(function(argv) {
-      if (argv.help || commands[argv._[0]] === undefined)
-        throw new Error('You must specify a command.');
-    })
-    .argv;
-
-  logger.level = argv.verbose ? 'debug' : 'info';
-  var command = argv._[0];
-  commands[command](argv);
-}
