@@ -154,12 +154,7 @@ function main() {
   }
   else if (argv.version) {
     // read birdy's own package.json for the current version
-    var package_json_path = path.join(__dirname, 'package.json');
-    fs.readFile(package_json_path, 'utf8', function(err, data) {
-      var obj = JSON.parse(data);
-      console.log(obj.version);
-      process.exit(0);
-    });
+    console.log(require('./package').version);
   }
   else {
     argv = full.argv;
