@@ -132,14 +132,17 @@ Before you send a pull request, please verify that:
    * Check that they're all the same.
    * Fall back to other urls if any of them error out with a 404 / 500.
 5. Add more libraries!
-   - d3
-   - date.js
-   - head.js
-   - lesscss
-   - mousetrap
-   - jquery.fileupload
-   - [js-url](https://github.com/websanova/js-url)
-   - jquery.mustache
+   - [D3.js](http://d3js.org/) (at v3)
+   - [HeadJS](http://headjs.com/) (at v0.99)
+   - [mousetrap](http://craig.is/killing/mice)
+   - [jquery.fileupload](http://blueimp.github.io/jQuery-File-Upload/)
+   - [jsSHA](https://github.com/Caligatio/jsSHA)
+6. Maybe add these, too (lower priority):
+   - [Hogan.js](http://twitter.github.io/hogan.js/) (although we have handlebars already)
+   - [LESS](http://lesscss.org/) (less.js)
+   - [date.js](http://www.datejs.com/) (although, it's a dead project, and we have moment.js now)
+   - [jquery.mustache](https://github.com/jonnyreeves/jquery-Mustache) (again, we have handlebars)
+
 
 <!-- 1. http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
 <!-- 1. http://schacon.github.io/git/git-read-tree.html#_sparse_checkout -->
