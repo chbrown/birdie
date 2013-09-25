@@ -16,25 +16,19 @@ var defaults = exports.defaults = {
 
 var copyFile = exports.copyFile = function(srcpath, dstpath, callback) {
   /** copy the file at `srcpath` to `dstpath`, removing the file at `dstpath`
-    if it exists, and creating directories up to `dstpath` if needed.
+  if it exists, and creating directories up to `dstpath` if needed.
 
-    `callback` signature: function(err) */
+  `callback`: function(Error | null) */
   var dirpath = path.dirname(dstpath);
   mkdirp(dirpath, function(err) {
-    if (err) {
-      callback(err);
-    }
-    else {
-      fs.unlink(dstpath, function(err) {
-        if (err && err.code != 'ENOENT') {
-          // ignore error if the file doesn't already exist
-          callback(err);
-        }
-        else {
-          fs.link(srcpath, dstpath, callback);
-        }
-      });
-    }
+    if (err) return callback(err);
+
+    fs.unlink(dstpath, function(err) {
+      if (err && err.code != 'ENOENT') return callback(err);
+      // ignore failed unlinks (i.e., 'ENOENT') if the file doesn't already exist
+
+      fs.link(srcpath, dstpath, callback);
+    });
   });
 };
 
@@ -42,24 +36,21 @@ var writeFile = exports.writeFile = function(filepath, data, callback) {
   /** create any required directories up to `filepath`, and write data to
     `filepath` with the default encoding.
 
-    `callback` signature: function(err) */
+    `callback`: function(Error | null) */
   var dirpath = path.dirname(filepath);
   mkdirp(dirpath, function(err) {
-    if (err) {
-      callback(err);
-    }
-    else {
-      fs.writeFile(filepath, data, callback);
-    }
+    if (err) return callback(err);
+
+    fs.writeFile(filepath, data, callback);
   });
 };
 
 var fetch = exports.fetch = function(uri, callback) {
   /** fetch the given `uri` based on its protocol, redirecting to the github
-    raw url for git:// uri's, raising an error for other git:// urls, and
-    simply retrieving the content from http: and https: urls as a buffer.
+  raw url for git:// uri's, raising an error for other git:// urls, and
+  simply retrieving the content from http: and https: urls as a buffer.
 
-    `callback` signature: function(err, data) */
+  `callback`: function(Error | null, data) */
   if (uri.match(/^git:\/\/github.com/)) {
     // github is really nice in that it exposes all files on all branches/tags
     // over http and https at unique urls. so great!
@@ -74,55 +65,49 @@ var fetch = exports.fetch = function(uri, callback) {
   else {
     // set encoding: null so that we get a buffer back as the body.
     request({uri: uri, encoding: null}, function (err, response, body) {
-      if (err) {
-        callback(err);
-      }
-      else if (response.statusCode != 200) {
+      if (err) return callback(err);
+      if (response.statusCode != 200) {
         var message = 'HTTP ' + response.statusCode + ' ' + uri;
-        callback(new Error(message), body);
+        return callback(new Error(message), body);
       }
-      else {
-        callback(null, body);
-      }
+
+      callback(null, body);
     });
   }
 };
 
 var downloadFiles = exports.downloadFiles = function(filename_urls, pattern, done) {
   /** download all files and save them to the local filesystem using the given
-    pattern. `filename_urls` is a hash from filenames to a list of urls, each
-    of which _should_ respond with the same content.
+  pattern. `filename_urls` is a hash from filenames to a list of urls, each
+  of which _should_ respond with the same content.
 
-    `done` signature: function(err) */
+  `done`: function(Error | null) */
   async.each(Object.keys(filename_urls), function(filename, callback) {
     var urls = filename_urls[filename];
     // just use the first url, for now
     var url = urls[0];
     fetch(url, function(err, data) {
-      if (err) {
+      if (err) return callback(err);
+
+      var filepath = pattern.replace(/\{file\}/g, filename);
+      writeFile(filepath, data, function (err) {
+        if (!err)
+          logger.info(filepath + ' < ' + url);
         callback(err);
-      }
-      else {
-        var filepath = pattern.replace(/\{file\}/g, filename);
-        writeFile(filepath, data, function (err) {
-          if (!err)
-            logger.info(filepath + ' < ' + url);
-          callback(err);
-        });
-      }
+      });
     });
   }, done);
 };
 
 var gitClone = exports.gitClone = function(pattern, git_url, callback) {
-  // callback signature: function(err)
+  // callback: function(Error | null)
   temp.mkdir(null, function(err, git_dir) {
-    logger.debug('git clone ' + git_url + ' ' + git_dir);
+    logger.debug('git clone %s %s', git_url, git_dir);
     child_process.spawn('git', ['clone', git_url, git_dir])
     .on('close', function (code) {
       // for each file in the git dir, besides .git/**, copy it as file
       if (code !== 0) {
-        logger.error('git clone exited with code ' + code);
+        logger.error('git clone exited with code %d', code);
       }
       glob('**', {cwd: git_dir, mark: true}, function(err, matches) {
         // filter off the empty string for the root directory
@@ -133,7 +118,7 @@ var gitClone = exports.gitClone = function(pattern, git_url, callback) {
           var filepath = pattern.replace(/\{file\}/g, file);
           copyFile(temppath, filepath, function(err) {
             if (!err)
-              logger.info(filepath + ' < ' + git_url + '/' + file);
+              logger.info('%s < %s/%s', filepath, git_url, file);
             callback(err);
           });
         }, callback);
@@ -146,7 +131,7 @@ var downloadResources = exports.downloadResources = function(pattern, resources,
   async.each(Object.keys(resources), function (resource_name, callback) {
     logger.debug('Downloading resource: %s', resource_name);
     var version = resources[resource_name];
-    logger.info(resource_name + ' version: ' + version);
+    logger.info('%s version: %s', resource_name, version);
 
     // we partially fill the pattern as we go along.
     var resource_pattern = pattern.replace(/\{resource\}/g, resource_name);
@@ -168,11 +153,8 @@ var downloadResources = exports.downloadResources = function(pattern, resources,
       }
     }
   }, function(err) {
-    if (err) {
-      logger.error(err.toString());
-    }
-    else {
-      logger.info('Installed');
-    }
+    if (err) return logger.error(err.toString());
+
+    logger.info('Installed');
   });
 };
