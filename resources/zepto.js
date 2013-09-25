@@ -1,13 +1,17 @@
-var cdn = require('../cdn');
-module.exports = function(version, callback) {
-  var versions = ['1.0', '0.8', '0.7', '0.6'];
-  version = {'*': '1.0'}[version] || version;
-  if (versions.indexOf(version) < 0)
-    console.error('That version is not officially supported.');
+'use strict'; /*jslint node: true, es5: true, indent: 2 */
+var birdy = require('..');
 
-  var cloudflare = cdn.cloudflare('zepto')(version);
+exports.versions = [
+  '0.6',
+  '0.7',
+  '0.8',
+  '1.0',
+];
+
+exports.resolve = function(version, callback) {
+  var cloudflare = birdy.cdn.cloudflare('zepto')(version);
   // github doesn't actually hold the builds!
-  // var github = cdn.github('madrobby/zepto')('v' + version);
+  // var github = birdy.cdn.github('madrobby/zepto')('v' + version);
   callback(null, {
     'zepto.min.js': [cloudflare('zepto.min.js')],
     'zepto.js': [cloudflare('zepto.js')]

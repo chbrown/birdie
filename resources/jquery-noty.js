@@ -1,9 +1,13 @@
-var cdn = require('../cdn');
-module.exports = function(version, callback) {
-  version = {'*': '2.0.3'}[version] || version;
+'use strict'; /*jslint node: true, es5: true, indent: 2 */
+var birdy = require('..');
 
-  var cloudflare = cdn.cloudflare('jquery-noty')(version);
-  var github = cdn.github('needim/noty')('v' + version);
+exports.versions = [
+  '2.0.3',
+];
+
+exports.resolve = function(version, callback) {
+  var cloudflare = birdy.cdn.cloudflare('jquery-noty')(version);
+  var github = birdy.cdn.github('needim/noty')('v' + version);
 
   var filename_urls = {
     'jquery-noty.js': [cloudflare('jquery.noty.js'), github('js/noty/jquery.noty.js')],

@@ -1,48 +1,17 @@
 'use strict'; /*jslint node: true, es5: true, indent: 2 */
 var async = require('async');
-var child_process = require('child_process');
 var fs = require('fs');
 var glob = require('glob');
-var logger = require('winston');
-var mkdirp = require('mkdirp');
 var path = require('path');
 var request = require('request');
-var temp = require('temp');
+
+var logger = require('./lib/logger');
+var fsp = require('./lib/fsp');
+var git = require('./lib/git');
 
 var defaults = exports.defaults = {
   staticPattern: 'static/{resource}/{file}',
-  staticDependencies: {}
-};
-
-var copyFile = exports.copyFile = function(srcpath, dstpath, callback) {
-  /** copy the file at `srcpath` to `dstpath`, removing the file at `dstpath`
-  if it exists, and creating directories up to `dstpath` if needed.
-
-  `callback`: function(Error | null) */
-  var dirpath = path.dirname(dstpath);
-  mkdirp(dirpath, function(err) {
-    if (err) return callback(err);
-
-    fs.unlink(dstpath, function(err) {
-      if (err && err.code != 'ENOENT') return callback(err);
-      // ignore failed unlinks (i.e., 'ENOENT') if the file doesn't already exist
-
-      fs.link(srcpath, dstpath, callback);
-    });
-  });
-};
-
-var writeFile = exports.writeFile = function(filepath, data, callback) {
-  /** create any required directories up to `filepath`, and write data to
-    `filepath` with the default encoding.
-
-    `callback`: function(Error | null) */
-  var dirpath = path.dirname(filepath);
-  mkdirp(dirpath, function(err) {
-    if (err) return callback(err);
-
-    fs.writeFile(filepath, data, callback);
-  });
+  staticDependencies: {},
 };
 
 var fetch = exports.fetch = function(uri, callback) {
@@ -64,8 +33,9 @@ var fetch = exports.fetch = function(uri, callback) {
   }
   else {
     // set encoding: null so that we get a buffer back as the body.
-    request({uri: uri, encoding: null}, function (err, response, body) {
+    request({uri: uri, encoding: null}, function(err, response, body) {
       if (err) return callback(err);
+
       if (response.statusCode != 200) {
         var message = 'HTTP ' + response.statusCode + ' ' + uri;
         return callback(new Error(message), body);
@@ -90,45 +60,18 @@ var downloadFiles = exports.downloadFiles = function(filename_urls, pattern, don
       if (err) return callback(err);
 
       var filepath = pattern.replace(/\{file\}/g, filename);
-      writeFile(filepath, data, function (err) {
-        if (!err)
-          logger.info(filepath + ' < ' + url);
-        callback(err);
+      fsp.writeFile(filepath, data, function(err) {
+        if (err) return callback(err);
+
+        logger.info('%s < %s', filepath, url);
+        callback();
       });
     });
   }, done);
 };
 
-var gitClone = exports.gitClone = function(pattern, git_url, callback) {
-  // callback: function(Error | null)
-  temp.mkdir(null, function(err, git_dir) {
-    logger.debug('git clone %s %s', git_url, git_dir);
-    child_process.spawn('git', ['clone', git_url, git_dir])
-    .on('close', function (code) {
-      // for each file in the git dir, besides .git/**, copy it as file
-      if (code !== 0) {
-        logger.error('git clone exited with code %d', code);
-      }
-      glob('**', {cwd: git_dir, mark: true}, function(err, matches) {
-        // filter off the empty string for the root directory
-        var files = matches.filter(function(m) { return !m.match(/\/$/); });
-        // files is a list of partial filepaths (i.e., files in directories, but not absolute)
-        async.each(files, function(file, callback) {
-          var temppath = path.join(git_dir, file);
-          var filepath = pattern.replace(/\{file\}/g, file);
-          copyFile(temppath, filepath, function(err) {
-            if (!err)
-              logger.info('%s < %s/%s', filepath, git_url, file);
-            callback(err);
-          });
-        }, callback);
-      });
-    });
-  });
-};
-
-var downloadResources = exports.downloadResources = function(pattern, resources, done) {
-  async.each(Object.keys(resources), function (resource_name, callback) {
+exports.downloadResources = function(pattern, resources, done) {
+  async.each(Object.keys(resources), function(resource_name, callback) {
     logger.debug('Downloading resource: %s', resource_name);
     var version = resources[resource_name];
     logger.info('%s version: %s', resource_name, version);
@@ -137,12 +80,43 @@ var downloadResources = exports.downloadResources = function(pattern, resources,
     var resource_pattern = pattern.replace(/\{resource\}/g, resource_name);
 
     if (version.match(/^git:/)) {
-      gitClone(resource_pattern, version, callback);
+      var git_url = version;
+      git.clone(git_url, function(err, git_dir) {
+        glob('**', {cwd: git_dir, mark: true}, function(err, matches) {
+          if (err) return callback(err);
+
+          // filter off the empty string for the root directory
+          var files = matches.filter(function(m) { return !m.match(/\/$/); });
+          // files is a list of partial filepaths (i.e., files in directories, but not absolute)
+          async.each(files, function(file, callback) {
+            var temppath = path.join(git_dir, file);
+            var filepath = resource_pattern.replace(/\{file\}/g, file);
+            fsp.link(temppath, filepath, function(err) {
+              if (err) return callback(err);
+
+              logger.info('%s < %s/%s', filepath, git_url, file);
+              callback();
+            });
+          }, callback);
+        });
+      });
     }
     else {
       try {
         var resource_module = require('./resources/' + resource_name);
-        resource_module(version, function(err, filename_urls) {
+        var versions = resource_module.versions;
+
+        if (versions !== undefined) {
+          // set the special '*' version to the last offical version
+          if (version == '*') {
+            version = versions[versions.length - 1];
+          }
+          else if (versions.indexOf(version) < 0) {
+            logger.error('That version is not officially supported: %s', version);
+          }
+        }
+
+        resource_module.resolve(version, function(err, filename_urls) {
           // filename_urls is a dictionary from filenames to lists of urls
           downloadFiles(filename_urls, resource_pattern, callback);
         });
@@ -156,5 +130,35 @@ var downloadResources = exports.downloadResources = function(pattern, resources,
     if (err) return logger.error(err.toString());
 
     logger.info('Installed');
+  });
+};
+
+// a few miscellaneous helpers:
+
+// every entry in the exports dictionary should have the following type:
+//   function(project -> version -> file) { return "some://uri"; }
+// but, well, curried.
+var resolver = function(base) {
+  return function(project) {
+    return function(version) {
+      return function(file) {
+        return base + [project, version, file].join('/');
+      };
+    };
+  };
+};
+
+// for github, @project is the full "author/repo" combo, @file is the fullpath, @version is a tag / branch
+exports.cdn = {
+  github: resolver('git://github.com/'),
+  http: resolver('http://'),
+  cloudflare: resolver('https://cdnjs.cloudflare.com/ajax/libs/'),
+  google: resolver('https://ajax.googleapis.com/ajax/libs/'),
+};
+
+// just a little helper I hack in to this class, which most of the resources will have around anyway.
+exports.mapApply = function(fns, x) {
+  return fns.map(function(fn) {
+    return fn(x);
   });
 };

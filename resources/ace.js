@@ -1,9 +1,13 @@
-var cdn = require('../cdn');
-module.exports = function(version, callback) {
-  version = {'*': '1.0.0'}[version] || version;
+'use strict'; /*jslint node: true, es5: true, indent: 2 */
+var birdy = require('..');
 
-  var cloudflare = cdn.cloudflare('ace')(version);
-  var github = cdn.github('ajaxorg/ace-builds')('v' + version);
+exports.versions = [
+  '1.0.0',
+];
+
+exports.resolve = function(version, callback) {
+  var cloudflare = birdy.cdn.cloudflare('ace')(version);
+  var github = birdy.cdn.github('ajaxorg/ace-builds')('v' + version);
 
   callback(null, {
     'ace.min.js': [github('src-min/ace.js'), cloudflare('ace.min.js')],

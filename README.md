@@ -2,8 +2,7 @@
 
 Birdy is a fast, fine-grained static asset management tool.
 It intends to replace [bower](https://github.com/bower/bower) for common uses,
-although it is not as flexible (but does have a certain flexibility that bower
-does not).
+although it is not as flexible (it does not include the kitchen sink).
 
 Goals:
 
@@ -83,11 +82,11 @@ Run `birdy --help` to see what flags to use.
 
 ## resources/*
 
-Every resource is an arbitrary javascript file that returns a function as `module.exports`.
+Every resource is an arbitrary javascript file that exposes a function as `module.exports`.
 
 Function signature:
 
-    function (version, callback) {
+    function(version, callback) {
       // compute a dictionary mapping filenames to lists of urls
       // each of the urls should return an identical file
       // the urls can be fully specified git paths

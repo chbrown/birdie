@@ -17,18 +17,15 @@
     "url": "git://github.com/chbrown/birdy.git"
   },
   "bin": {
-    "birdy": "cli.js"
+    "birdy": "bin/birdy.js"
   },
-  "main": "index.js",
   "dependencies": {
     "async": "*",
     "glob": "*",
     "mkdirp": "*",
     "optimist": "*",
     "request": "*",
-    "semver": "*",
     "temp": "*",
-    "underscore": "*",
     "winston": "*"
   },
   "devDependencies": {

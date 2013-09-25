@@ -1,14 +1,24 @@
-var cdn = require('../cdn');
-module.exports = function(version, callback) {
-  var versions = ['2.1.2', '2.1.1', '2.1.0', '2.0.1', '2.0.0',
-    '1.1.2', '1.1.1', '1.1.0', '1.0.2', '1.0.1', '1.0.0'];
-  version = {'*': '1.1.2'}[version] || version;
-  if (versions.indexOf(version) < 0)
-    console.error('That version is not officially supported.');
+'use strict'; /*jslint node: true, es5: true, indent: 2 */
+var birdy = require('..');
 
-  var github = cdn.github('necolas/normalize.css')('v' + version);
-  var cloudflare = cdn.cloudflare('normalize')(version);
+exports.versions = [
+  '1.0.0',
+  '1.0.1',
+  '1.0.2',
+  '1.1.0',
+  '1.1.1',
+  '1.1.2',
+  '2.0.0',
+  '2.0.1',
+  '2.1.0',
+  '2.1.1',
+  '2.1.2',
+];
+
+exports.resolve = function(version, callback) {
+  var github = birdy.cdn.github('necolas/normalize.css')('v' + version);
+  var cloudflare = birdy.cdn.cloudflare('normalize')(version);
   callback(null, {
-    'normalize.css': cdn.mapApply([github, cloudflare], 'normalize.css')
+    'normalize.css': birdy.mapApply([github, cloudflare], 'normalize.css')
   });
 };

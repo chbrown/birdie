@@ -1,12 +1,14 @@
-var cdn = require('../cdn');
-module.exports = function(version, callback) {
-  var versions = ['2.3.2', '2.3.1'];
-  version = {'*': '2.3.1'}[version] || version;
-  if (versions.indexOf(version) < 0)
-    console.error('That version is not officially supported.');
+'use strict'; /*jslint node: true, es5: true, indent: 2 */
+var birdy = require('..');
 
-  var cloudflare = cdn.cloudflare('twitter-bootstrap')(version);
-  var bootstrapcdn = cdn.http('netdna.bootstrapcdn.com/twitter-bootstrap')(version);
+exports.versions = [
+  '2.3.1',
+  '2.3.2',
+];
+
+exports.resolve = function(version, callback) {
+  var cloudflare = birdy.cdn.cloudflare('twitter-bootstrap')(version);
+  var bootstrapcdn = birdy.cdn.http('netdna.bootstrapcdn.com/twitter-bootstrap')(version);
 
   // bootstrap.css expects glyphicons at ../img/glyphicons-halflings.png
   // despite this being reasonable, this unfortunately means we have to
@@ -25,7 +27,7 @@ module.exports = function(version, callback) {
 
   var filename_urls = {};
   for (var file in files) {
-    filename_urls[file] = cdn.mapApply([cloudflare, bootstrapcdn], files[file]);
+    filename_urls[file] = birdy.mapApply([cloudflare, bootstrapcdn], files[file]);
   }
 
   callback(null, filename_urls);
