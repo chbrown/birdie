@@ -22,6 +22,7 @@
   "dependencies": {
     "async": "*",
     "glob": "*",
+    "minimatch": "*",
     "mkdirp": "*",
     "optimist": "*",
     "request": "*",

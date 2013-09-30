@@ -2,6 +2,7 @@
 var async = require('async');
 var fs = require('fs');
 var glob = require('glob');
+var minimatch = require('minimatch');
 var path = require('path');
 var request = require('request');
 
@@ -46,7 +47,7 @@ var fetch = exports.fetch = function(uri, callback) {
   }
 };
 
-var downloadFiles = exports.downloadFiles = function(filename_urls, pattern, done) {
+var installFromUrls = exports.installFromUrls = function(filename_urls, pattern, done) {
   /** download all files and save them to the local filesystem using the given
   pattern. `filename_urls` is a hash from filenames to a list of urls, each
   of which _should_ respond with the same content.
@@ -70,6 +71,56 @@ var downloadFiles = exports.downloadFiles = function(filename_urls, pattern, don
   }, done);
 };
 
+var installFromGit = exports.installFromGit = function(git_url, resource_pattern, callback) {
+  /** Clone a remote git repository to a temporary directory and copy the files over from the temporary location.
+
+  TODO: cleanup after finishing the download.
+  */
+  git.clone(git_url, function(err, git_dir) {
+    // if there is a package.json, see if it has a staticIgnore field, and ignore those paths if it does.
+    var git_package_json_filepath = path.join(git_dir, 'package.json');
+
+    fs.readFile(git_package_json_filepath, function(err, data) {
+      var package_json = JSON.parse(data || '{}');
+      var ignore_patterns = (package_json.staticIgnore || []).map(function(raw) {
+        // we expand trailing /* into /** (since we are only copying over files)
+        var pattern = raw.replace(/\/\*$/, '/**');
+        logger.debug('ignoring glob: %s', pattern);
+        return pattern;
+      });
+
+      // {mark: true} ensures that matching directories will end with a slash, like 'folder/'
+      glob('**', {cwd: git_dir, mark: true, dot: true}, function(err, matches) {
+        if (err) return callback(err);
+
+        var files = matches.filter(function(file) {
+          // ignore directories
+          var isdir = file.match(/\/$/);
+          // and things that match the staticIgnore flag in the target package
+          var ignored = ignore_patterns.some(function(pattern) {
+            return minimatch(file, pattern, {matchBase: true});
+          });
+          // and typical source repository folders
+          var isversioncontrol = file.match(/^(\.git|\.hg|\.svn|\.bzr|_darcs|CVS)/);
+
+          return !(isdir || ignored || isversioncontrol);
+        });
+        // files is a list of partial filepaths (i.e., files in directories, but not absolute)
+        async.each(files, function(file, callback) {
+          var temppath = path.join(git_dir, file);
+          var filepath = resource_pattern.replace(/\{file\}/g, file);
+          fsp.link(temppath, filepath, function(err) {
+            if (err) return callback(err);
+
+            logger.info('%s < %s/%s', filepath, git_url, file);
+            callback();
+          });
+        }, callback);
+      });
+    });
+  });
+};
+
 exports.downloadResources = function(pattern, resources, done) {
   async.each(Object.keys(resources), function(resource_name, callback) {
     logger.debug('Downloading resource: %s', resource_name);
@@ -80,26 +131,9 @@ exports.downloadResources = function(pattern, resources, done) {
     var resource_pattern = pattern.replace(/\{resource\}/g, resource_name);
 
     if (version.match(/^git:/)) {
-      var git_url = version;
-      git.clone(git_url, function(err, git_dir) {
-        glob('**', {cwd: git_dir, mark: true}, function(err, matches) {
-          if (err) return callback(err);
-
-          // filter off the empty string for the root directory
-          var files = matches.filter(function(m) { return !m.match(/\/$/); });
-          // files is a list of partial filepaths (i.e., files in directories, but not absolute)
-          async.each(files, function(file, callback) {
-            var temppath = path.join(git_dir, file);
-            var filepath = resource_pattern.replace(/\{file\}/g, file);
-            fsp.link(temppath, filepath, function(err) {
-              if (err) return callback(err);
-
-              logger.info('%s < %s/%s', filepath, git_url, file);
-              callback();
-            });
-          }, callback);
-        });
-      });
+      // the version-as-git-url thing works differently than the github resource url;
+      // in this case, we actually clone the whole repo and copy it over
+      installFromGit(version, resource_pattern, callback);
     }
     else {
       try {
@@ -118,7 +152,7 @@ exports.downloadResources = function(pattern, resources, done) {
 
         resource_module.resolve(version, function(err, filename_urls) {
           // filename_urls is a dictionary from filenames to lists of urls
-          downloadFiles(filename_urls, resource_pattern, callback);
+          installFromUrls(filename_urls, resource_pattern, callback);
         });
       }
       catch (exc) {

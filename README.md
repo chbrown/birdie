@@ -126,17 +126,20 @@ Before you send a pull request, please verify that:
    * Maybe even incorporating the file creation time as a `If-Modified-Since`
      header, and ignoring "304 Not Modified" responses.
 3. Cache locally like `bower` does, something like `~/.birdy/`?
-4. Use multiple urls when available. Ideas:
+4. Look for a config file when including a tarball / git repo (`package.json`?)
+   * Inside that config file, look for a field describing ignored files (`staticIgnore`?)
+   * Do not copy over filepaths that match those globs / filenames
+5. Use multiple urls when available. Ideas:
    * Randomize which url gets picked.
    * Check that they're all the same.
    * Fall back to other urls if any of them error out with a 404 / 500.
-5. Add more libraries!
+6. Add more libraries!
    - [D3.js](http://d3js.org/) (at v3)
    - [HeadJS](http://headjs.com/) (at v0.99)
    - [mousetrap](http://craig.is/killing/mice)
    - [jquery.fileupload](http://blueimp.github.io/jQuery-File-Upload/)
    - [jsSHA](https://github.com/Caligatio/jsSHA)
-6. Maybe add these, too (lower priority):
+7. Maybe add these, too (lower priority):
    - [Hogan.js](http://twitter.github.io/hogan.js/) (although we have handlebars already)
    - [LESS](http://lesscss.org/) (less.js)
    - [date.js](http://www.datejs.com/) (although, it's a dead project, and we have moment.js now)
@@ -144,8 +147,7 @@ Before you send a pull request, please verify that:
 
 
 <!-- 1. http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
-<!-- 1. http://schacon.github.io/git/git-read-tree.html#_sparse_checkout -->
-<!-- 5. https://github.com/chbrown/static-lib -->
+<!-- 2. http://schacon.github.io/git/git-read-tree.html#_sparse_checkout -->
 
 ## License
 
