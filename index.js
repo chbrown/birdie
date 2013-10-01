@@ -137,6 +137,7 @@ exports.downloadResources = function(pattern, resources, done) {
     }
     else {
       try {
+        // a circular require except that the required module will never call downloadResources
         var resource_module = require('./resources/' + resource_name);
         var versions = resource_module.versions;
 
