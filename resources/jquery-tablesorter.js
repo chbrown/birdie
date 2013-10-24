@@ -33,6 +33,7 @@ exports.resolve = function(version, callback) {
   };
 
   [
+    'black-asc.gif',
     'black-desc.gif',
     'black-unsorted.gif',
     'dropbox-asc-hovered.png',
