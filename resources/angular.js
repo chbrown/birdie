@@ -12,6 +12,12 @@ exports.versions = [
   '1.1.3',
   '1.1.4',
   '1.1.5',
+  '1.2.0',
+  '1.2.1',
+  '1.2.2',
+  '1.2.3',
+  '1.2.4',
+  '1.2.5',
 ];
 
 exports.resolve = function(version, callback) {
@@ -20,7 +26,7 @@ exports.resolve = function(version, callback) {
   var google = birdy.cdn.google('angularjs')(version);
   var http = birdy.cdn.http('code.angularjs.org')(version);
   callback(null, {
-    'angular.min.js': birdy.mapApply([cloudflare, google, http], 'angular.min.js'),
-    'angular.js': birdy.mapApply([cloudflare, google, http], 'angular.js')
+    'angular.min.js': birdy.mapApply([http, google, cloudflare], 'angular.min.js'),
+    'angular.js': birdy.mapApply([http, google, cloudflare], 'angular.js')
   });
 };
