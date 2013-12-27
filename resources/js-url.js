@@ -30,7 +30,7 @@ exports.resolve = function(version, callback) {
   var github = birdy.cdn.github('websanova/js-url')('v' + version);
 
   callback(null, {
-    'js-url.min.js': birdy.mapApply([github, cloudflare], 'js-url.min.js'),
-    'js-url.js': birdy.mapApply([github, cloudflare], 'js-url.js')
+    'js-url.min.js': birdy.mapApply([github, cloudflare], 'url.min.js'),
+    'js-url.js': birdy.mapApply([github, cloudflare], 'url.js')
   });
 };
