@@ -3,9 +3,9 @@ var async = require('async');
 var fs = require('fs');
 var path = require('path');
 var glob = require('glob');
+var logger = require('loge');
 
 var birdy = require('..');
-var logger = require('../lib/logger');
 
 exports.init = function(argv) {
   var package_strings = argv._.slice(1);

@@ -5,8 +5,8 @@ var glob = require('glob');
 var minimatch = require('minimatch');
 var path = require('path');
 var request = require('request');
+var logger = require('loge');
 
-var logger = require('./lib/logger');
 var fsp = require('./lib/fsp');
 var git = require('./lib/git');
 
