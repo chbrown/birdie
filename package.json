@@ -22,12 +22,14 @@
   "dependencies": {
     "async": "*",
     "glob": "*",
+    "js-yaml": "*",
     "loge": "*",
     "minimatch": "*",
     "mkdirp": "*",
     "optimist": "*",
     "request": "*",
-    "temp": "*"
+    "temp": "*",
+    "underscore": "*"
   },
   "devDependencies": {
     "grunt": "*"

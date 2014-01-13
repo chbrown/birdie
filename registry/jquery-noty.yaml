@@ -1,0 +1,27 @@
+---
+name: jquery-noty
+versions:
+  - 2.0.3
+
+$cdnjs: cdnjs://jquery-noty/$version/$file
+$github: github://needim/noty/v$version
+
+files:
+  jquery-ui.js:
+  jquery-ui.min.js: [$cdnjs, $github]
+
+files:
+  jquery-noty.js: [$cdnjs, $github/js/noty/jquery.noty.js]
+  jquery-noty.theme.js: [$github/js/noty/themes/default.js]
+  layouts/bottom.js: &layout [$github/js/noty/$file]
+  layouts/bottomCenter.js: *layout
+  layouts/bottomLeft.js: *layout
+  layouts/bottomRight.js: *layout
+  layouts/centerLeft.js: *layout
+  layouts/center.js: *layout
+  layouts/centerRight.js: *layout
+  layouts/inline.js: *layout
+  layouts/top.js: *layout
+  layouts/topCenter.js: *layout
+  layouts/topLeft.js: *layout
+  layouts/topRight.js: *layout

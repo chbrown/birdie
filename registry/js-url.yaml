@@ -1,0 +1,16 @@
+---
+versions:
+  - 1.{0..6}.0
+  - 1.7.{0..6}
+  - 1.8.{0..6}
+
+$cdnjs: cdnjs://js-url/$version
+$github: github://websanova/js-url/v$version
+
+files:
+  js-url.js:
+    - $cdnjs/url.js
+    - $github/url.js
+  js-url.min.js:
+    - $cdnjs/url.min.js
+    - $github/url.min.js

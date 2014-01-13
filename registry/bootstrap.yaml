@@ -1,0 +1,20 @@
+versions:
+- 2.3.{1..2}
+
+$cdnjs: cdnjs://twitter-bootstrap/$version
+$http: http://netdna.bootstrapcdn.com/twitter-bootstrap/$version
+
+# bootstrap.css expects glyphicons at ../img/glyphicons-halflings.png
+# despite this being reasonable, this unfortunately means we have to
+# broach the usual flat directory structure policy and put both css/
+# and img/ resources in subfolders
+
+files:
+  css/bootstrap-responsive.css: &all [$cdnjs/$file, $httpfile/$file]
+  css/bootstrap-responsive.min.css: *all
+  css/bootstrap.css: *all
+  css/bootstrap.min.css: *all
+  bootstrap.js: &jsall [$cdnjs/js/$file, $httpfile/js/$file]
+  bootstrap.min.js: *jsall
+  img/glyphicons-halflings-white.png: *all
+  img/glyphicons-halflings.png: *all

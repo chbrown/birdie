@@ -1,0 +1,13 @@
+name: angular
+versions:
+  - 1.0.{0..6}
+  - 1.1.{3..5}
+  - 1.2.{0..6}
+
+$cdnjs: cdnjs://angular.js/$version/$file
+$google: google://angularjs/$version/$file
+$http: http://code.angularjs.org/$version/$file
+
+files:
+  angular.js: [$google, $cdnjs, $http]
+  angular.min.js: [$google, $cdnjs, $http]

@@ -1,4 +1,5 @@
 'use strict'; /*jslint node: true, es5: true, indent: 2 */
+var _ = require('underscore');
 var async = require('async');
 var fs = require('fs');
 var path = require('path');
@@ -6,64 +7,41 @@ var glob = require('glob');
 var logger = require('loge');
 
 var birdy = require('..');
+var Dependency = require('../dependency');
+var config = require('../config');
 
 exports.init = function(argv) {
-  var package_strings = argv._.slice(1);
-  fs.readFile(argv.config, function(err, data) {
-    if (err && err.code != 'ENOENT') {
-      // die on any error *besides* a missing config file
-      throw err;
-    }
+  // the first argument was the command. the others are dependencies
+  config.read(argv.config, argv.staticPattern, argv._.slice(1), function(err, dependencies, pattern, package_object) {
+    if (err) return logger.error('config.read error:', err);
 
-    var package_json = {};
-    if (err && err.code == 'ENOENT') {
-      logger.info('Creating "%s"', argv.config);
-    }
-    else {
-      try {
-        package_json = JSON.parse(data);
-      }
-      catch (exc) {
-        logger.error('Could not parse "%s" as JSON: %s\n%s', argv.config, exc, package_json);
-      }
-    }
+    // logger.debug('dependencies: %j -> %j', dependencies, Dependency.makeMap(dependencies));
 
-    var resources = package_json.staticDependencies || {};
-    package_strings.forEach(function(package_string) {
-      var parts = package_string.split(/==?/);
-      // 1) if a particular version is specified, use that.
-      // or 2) if there is already a version specified in the package.json, use
-      // it instead. 3) default to '*' in all other cases
-      resources[parts[0]] = parts[1] || resources[parts[0]] || '*';
-    });
+    package_object.staticPattern = pattern;
+    package_object.staticDependencies = Dependency.makeMap(dependencies);
 
-    package_json.staticDependencies = resources;
-    // the staticPattern option defers to 1) the command line argument, if specified.
-    // otherwise, it will use 2) the pattern specified by the config file, or, if
-    // neither is specified, the default, 3) "static/{resource}/{file}"
-    package_json.staticPattern = argv.staticPattern || package_json.staticPattern || birdy.defaults.staticPattern;
-    fs.writeFile(argv.config, JSON.stringify(package_json, null, '  '), function(err) {
+    // logger.debug('Writing config: %j', package_object);
+
+    fs.writeFile(argv.config, JSON.stringify(package_object, null, '  '), function(err) {
       if (err) return logger.error('fs.writeFile error: %s', err);
 
-      logger.info('Saved package.json');
+      logger.info('Wrote "%s"', argv.config);
     });
   });
 };
 
 exports.install = function(argv) {
-  fs.readFile(argv.config, function(err, data) {
-    var package_json = JSON.parse(data || '{}');
-    var pattern = argv.staticPattern || package_json.staticPattern || birdy.defaults.staticPattern;
-    var resources = package_json.staticDependencies || {};
+  config.read(argv.config, argv.staticPattern, argv._.slice(1), function(err, dependency_list, pattern, package_object) {
+    // todo: check for --save flag and writeFile like in init?
+    // logger.debug('Dependencies:', dependency_list.dependencies);
 
-    // the first argument was the command. the others are packages
-    var package_strings = argv._.slice(1);
-    package_strings.forEach(function(package_string) {
-      var parts = package_string.split(/==?/);
-      resources[parts[0]] = parts[1] || resources[parts[0]] || '*';
+    async.each(dependency_list.dependencies, function(dependency, callback) {
+      dependency.fetch(pattern, callback);
+    }, function(err) {
+      if (err) return logger.error(err);
+
+      logger.info('Done installing');
     });
-
-    birdy.downloadResources(pattern, resources);
   });
 };
 
@@ -86,7 +64,7 @@ exports.search = function(argv) {
           var urls = filename_urls[filename];
           var line = '  - ' + filename;
           if (argv.verbose) {
-            line += ' [' + urls[0] + ', ...]';
+            line += ' [' + urls[0].join(', ') + ']';
           }
           console.log(line);
         }

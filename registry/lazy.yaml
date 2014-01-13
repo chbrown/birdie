@@ -1,0 +1,9 @@
+---
+versions:
+  - '0.1'
+
+$github: github://dtao/lazy.js/v$version/$file
+
+files:
+  lazy.js: [$github]
+  lazy.min.js: [$github]

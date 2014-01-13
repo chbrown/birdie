@@ -10,7 +10,7 @@ var optimist = require('optimist')
     '    create package.json or add "staticDependencies" hash to it,',
     '    prefilled with the given packages',
     '',
-    '  install [jquery] [underscore]',
+    '  install [jquery] [underscore==1.5.2]',
     '    fetch the packages specified in "staticDependencies" in your',
     '    package.json, as well as at the command line, and install them',
     '    into the specified folder.',
@@ -24,7 +24,7 @@ var optimist = require('optimist')
     version: 'print birdy version and exit',
     verbose: 'print extra output',
     config: 'JSON config file with staticPattern and staticDependencies fields.',
-    pattern: 'naming scheme for local files - defaults to static/{resource}/{file}',
+    pattern: 'naming scheme for local files - defaults to "static/{resource}/{file}"',
   })
   .boolean(['help', 'verbose', 'version'])
   .default({

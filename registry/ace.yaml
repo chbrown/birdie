@@ -1,0 +1,18 @@
+name: ace
+versions:
+  - 0.1.{0..6}
+  - 0.2.0
+  - 1.0.0
+  - 1.1.01
+  - 1.1.1
+
+$github: github://ajaxorg/ace-builds/v$version
+$cdnjs: cdnjs://ace/$version/$file
+
+files:
+  ace.js:
+    - $github/src/ace.js
+    - $cdnjs
+  ace.min.js:
+    - $github/src-min/ace.js
+    - $cdnjs

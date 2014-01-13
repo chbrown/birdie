@@ -73,6 +73,18 @@ Then fetch them!
 
     birdy install
 
+
+#### `staticDependencies`
+
+Every entry in `staticDependencies` has a key, the `resource` name, and a flexible value field.
+
+Possible values are:
+
+* A version, e.g., "*", or "1.10.2".
+* A git repository url, e.g., "git://github.com/chbrown/misc-js.git"
+* A dictionary with
+
+
 ### Command line options
 
 You can specify all these options at the command line, instead of `package.json`.
@@ -144,6 +156,7 @@ Before you send a pull request, please verify that:
    - [LESS](http://lesscss.org/) (less.js)
    - [date.js](http://www.datejs.com/) (although, it's a dead project, and we have moment.js now)
    - [jquery.mustache](https://github.com/jonnyreeves/jquery-Mustache) (again, we have handlebars)
+8. Support `bower.json` files (for Bower-like functionality)
 
 
 <!-- 1. http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->

@@ -1,0 +1,8 @@
+---
+versions: []
+
+$github: github://douglascrockford/JSON-js
+
+files:
+  json2.js:
+    - $github/master/json2.js

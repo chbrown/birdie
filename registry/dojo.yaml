@@ -1,0 +1,10 @@
+versions:
+  - 1.9.2
+
+$http: http://download.dojotoolkit.org/release-$version
+
+files:
+  dojo.js:
+    - $http/dojo.js.uncompressed.js
+  dojo.min.js:
+    - $http/dojo.js

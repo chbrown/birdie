@@ -1,0 +1,9 @@
+versions:
+  - 0.7.2
+
+$github: github://bebraw/colorjoe/$version
+
+files:
+  colorjoe.js: [$github/dist/colorjoe.js]
+  colorjoe.min.js: [$github/dist/colorjoe.min.js]
+  colorjoe.css: [$github/css/colorjoe.css]
