@@ -35,9 +35,7 @@ exports.install = function(argv) {
     // todo: check for --save flag and writeFile like in init?
     // logger.debug('Dependencies:', dependency_list.dependencies);
 
-    async.each(dependency_list.dependencies, function(dependency, callback) {
-      dependency.fetch(pattern, callback);
-    }, function(err) {
+    birdy.install(dependency_list, pattern, function(err) {
       if (err) return logger.error(err);
 
       logger.info('Done installing');

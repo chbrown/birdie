@@ -94,7 +94,7 @@ var queryRegistry = function(name, version, callback) {
       if (version == '*') {
         ctx.$version = _.last(registry_versions);
       }
-      else if (versions.indexOf(version) < 0) {
+      else if (registry_versions.indexOf(version) < 0) {
         logger.error('Version not officially supported: %s', version);
       }
     }

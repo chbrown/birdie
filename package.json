@@ -32,6 +32,10 @@
     "underscore": "*"
   },
   "devDependencies": {
-    "grunt": "*"
+    "grunt": "*",
+    "tap": "*"
+  },
+  "scripts": {
+    "test": "tap test"
   }
 }
