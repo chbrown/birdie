@@ -121,6 +121,10 @@ Function signature:
 
 The callback is not guaranteed to be async (e.g., `setImmediate` or requiring some fetch).
 
+## Tests
+
+**Travis CI Build Status**: [![Travis CI Build Status](https://api.travis-ci.org/chbrown/birdy.png)](https://travis-ci.org/chbrown/birdy)
+
 ### Contributing
 
 Fork and send a pull request.
