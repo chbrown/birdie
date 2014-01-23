@@ -1,0 +1,55 @@
+---
+versions:
+  - 2.0.{6..31}
+  - '2.1'
+  - 2.1.{1..20}
+  - '2.2'
+  - 2.2.{1..2}
+  - '2.3'
+  - 2.3.{1..11}
+  - '2.4'
+  - 2.4.1
+  - 2.4.3
+  - 2.4.{5..8}
+  - '2.5'
+  - 2.5.{1..2}
+  - '2.6'
+  - 2.6.{1..2}
+  - '2.7'
+  - 2.7.{1..12}
+  - 2.8.{0..2}
+  - 2.9.{0..1}
+  - 2.10.{0..8}
+  - 2.11.{0..1}
+  - 2.12.0
+  - 2.13.{0..3}
+  - 2.14.{0..3}
+
+# The versions that cloudflare exposes are weird, 2.5.2, 2.9.1, and now 2.13.3
+# The jquery-tablesorter homepage doesn't expose versioned sources, so I go with the birdy.cdn.
+# cdnjs doesn't provide the css or gifs, unfortunately
+$cdnjs: cdnjs://jquery.tablesorter/$version
+$github: github://Mottie/tablesorter/v$version
+
+files:
+  jquery-tablesorter.js:             [$github/js/jquery.tablesorter.js,             $cdnjs/jquery.tablesorter.js            ]
+  jquery-tablesorter.min.js:         [$github/js/jquery.tablesorter.min.js,         $cdnjs/jquery.tablesorter.min.js        ]
+  jquery-tablesorter-widgets.js:     [$github/js/jquery.tablesorter.widgets.js,     $cdnjs/jquery.tablesorter.widgets.js    ]
+  jquery-tablesorter-widgets.min.js: [$github/js/jquery.tablesorter.widgets.min.js, $cdnjs/jquery.tablesorter.widgets.min.js]
+  img/black-asc.gif:                 [$github/css/images/black-asc.gif]
+  img/black-desc.gif:                [$github/css/images/black-desc.gif]
+  img/black-unsorted.gif:            [$github/css/images/black-unsorted.gif]
+  img/dropbox-asc-hovered.png:       [$github/css/images/dropbox-asc-hovered.png]
+  img/dropbox-asc.png:               [$github/css/images/dropbox-asc.png]
+  img/dropbox-desc-hovered.png:      [$github/css/images/dropbox-desc-hovered.png]
+  img/dropbox-desc.png:              [$github/css/images/dropbox-desc.png]
+  img/green-asc.gif:                 [$github/css/images/green-asc.gif]
+  img/green-desc.gif:                [$github/css/images/green-desc.gif]
+  img/green-header.gif:              [$github/css/images/green-header.gif]
+  img/green-unsorted.gif:            [$github/css/images/green-unsorted.gif]
+  img/ice-asc.gif:                   [$github/css/images/ice-asc.gif]
+  img/ice-desc.gif:                  [$github/css/images/ice-desc.gif]
+  img/ice-unsorted.gif:              [$github/css/images/ice-unsorted.gif]
+  img/white-asc.gif:                 [$github/css/images/white-asc.gif]
+  img/white-desc.gif:                [$github/css/images/white-desc.gif]
+  img/white-unsorted.gif:            [$github/css/images/white-unsorted.gif]
