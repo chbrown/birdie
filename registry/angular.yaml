@@ -9,5 +9,9 @@ $google: google://angularjs/$version/$file
 $http: http://code.angularjs.org/$version/$file
 
 files:
-  angular.js: [$google, $cdnjs, $http]
-  angular.min.js: [$google, $cdnjs, $http]
+  angular.js: &all [$google, $cdnjs, $http]
+  angular.min.js: *all
+  angular-resource.js: *all
+  angular-resource.min.js: *all
+  angular-cookies.js: *all
+  angular-cookies.min.js: *all
