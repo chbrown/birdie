@@ -2,7 +2,7 @@
 versions:
   - 0.{2..8}
   - "1.0"
-  - 1.1.{0..2}
+  - 1.1.{0..3}
 
 # $github: github://madrobby/zepto/v$version
 # github doesn't actually host any of the builds, though!
