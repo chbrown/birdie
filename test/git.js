@@ -12,7 +12,7 @@ tap.test('git', function(t) {
   var list = birdy.DependencyList.parse({
     'misc-js': {
       'url': 'git://github.com/chbrown/misc-js.git',
-      'filter': ['textarea.js', 'url.js', 'jquery-autocomplete.js']
+      'filter': ['cookies.js', 'textarea.js']
     },
   });
 
@@ -21,10 +21,10 @@ tap.test('git', function(t) {
     birdy.install(list, pattern, function(err) {
       t.notOk(err, 'birdy.install should not raise an error');
 
-      var expected = ['jquery-autocomplete.js', 'textarea.js', 'url.js'];
+      var expected = ['cookies.js', 'textarea.js'];
       var children = fs.readdirSync(dir_path);
 
-      t.deepEqual(children.sort(), expected, 'Only three files should be cloned');
+      t.deepEqual(children.sort(), expected, 'Only two files should be cloned');
       t.end();
     });
   });
