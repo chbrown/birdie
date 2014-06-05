@@ -1,0 +1,11 @@
+name: ng-storage
+versions:
+  - 0.1.0
+  - 0.2.{0..3}
+  - 0.3.0
+
+$github: github://gsklee/ngStorage/$version/$file
+
+files:
+  ngStorage.js: [$github]
+  ngStorage.min.js: [$github]
