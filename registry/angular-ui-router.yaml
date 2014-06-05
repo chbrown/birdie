@@ -1,0 +1,11 @@
+name: angular-ui-router
+versions:
+  - 0.0.1
+  - 0.2.0
+  - 0.2.{5..10}
+
+$github: github://angular-ui/ui-router/$version/release/$file
+
+files:
+  angular-ui-router.js: [$github]
+  angular-ui-router.min.js: [$github]
