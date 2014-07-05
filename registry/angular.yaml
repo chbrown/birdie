@@ -17,5 +17,7 @@ files:
   angular-cookies.min.js: *all
   angular-route.js: *all
   angular-route.min.js: *all
+  angular-sanitize.js: *all
+  angular-sanitize.min.js: *all
   angular-touch.js: *all
   angular-touch.min.js: *all
