@@ -4,7 +4,7 @@ versions:
   - 0.2.0
   - 1.0.0
   - 1.1.01
-  - 1.1.1
+  - 1.1.{1..5}
 
 $github: github://ajaxorg/ace-builds/v$version
 $cdnjs: cdnjs://ace/$version/$file

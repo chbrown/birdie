@@ -2,6 +2,7 @@
 name: riot
 versions:
   - 0.9.{2..8}
+  - 1.0.{0..1}
 
 $github: github://moot/riotjs/v$version
 
