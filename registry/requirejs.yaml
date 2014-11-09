@@ -1,0 +1,15 @@
+---
+versions:
+  - 0.2.{0..1}
+  - 0.{8..27}.0
+  - 0.14.{0..5}
+  - 0.27.1
+  - 1.0.{0..8}
+  - 2.0.{1..6}
+  - 2.1.{0..15}
+
+$cdnjs: cdnjs://require.js/$version/$file
+
+files:
+  require.js: [$cdnjs, "http://requirejs.org/docs/release/$version/comments/require.js"]
+  require.min.js: [$cdnjs, "http://requirejs.org/docs/release/$version/minified/require.js"]
