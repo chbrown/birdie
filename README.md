@@ -8,7 +8,7 @@ Goals:
 
 * **Curated repository / database of resources.** More like
   [homebrew](https://github.com/mxcl/homebrew) than [npm](https://npmjs.org/),
-  in that it's not publically writable, and all changes are recorded in source
+  in that it's not publicly writable, and all changes are recorded in source
   control.
 * **Fast.** Does not clone the entire git repository (which often contains
   tests, benchmarks, etc.), but only the files you (ought to) want.
@@ -34,9 +34,12 @@ Add resources to the newly created "staticDependencies" hash in your `package.js
       ...
       "staticDependencies": {
         "jquery": "2.0.0",
-        "backbone": "*",
         "handlebars": "*",
-        "bootstrap": "*"
+        "angular-translate": "git://github.com/angular-translate/bower-angular-translate.git",
+        "tv4": {
+          "url": "git://github.com/geraintluff/tv4.git",
+          "filter": ["tv4.js", "tv4.min.js"]
+        }
       }
     }
 
@@ -156,10 +159,7 @@ Before you send a pull request, please verify that:
    - [jquery.fileupload](http://blueimp.github.io/jQuery-File-Upload/)
    - [jsSHA](https://github.com/Caligatio/jsSHA)
 7. Maybe add these, too (lower priority):
-   - [Hogan.js](http://twitter.github.io/hogan.js/) (although we have handlebars already)
    - [LESS](http://lesscss.org/) (less.js)
-   - [date.js](http://www.datejs.com/) (although, it's a dead project, and we have moment.js now)
-   - [jquery.mustache](https://github.com/jonnyreeves/jquery-Mustache) (again, we have handlebars)
 8. Support `bower.json` files (for Bower-like functionality)
 
 
