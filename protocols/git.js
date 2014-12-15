@@ -19,8 +19,6 @@ function isVersionControl(filepath) {
   return filepath.match(/^(\.git|\.hg|\.svn|\.bzr|_darcs|CVS)/);
 }
 
-// function get_staticIgnore_test(package_filepath) {}
-
 var fetch = exports.fetch = function(url, staticPattern, filter, callback) {
   /**
   1. Clone a remote git repository to a temporary directory,
