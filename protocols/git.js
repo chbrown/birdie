@@ -30,10 +30,7 @@ var fetch = exports.fetch = function(url, staticPattern, filter, callback) {
   TODO: cleanup after finishing the download.
   */
   var isSelected = function(filepath) {
-    if (!filter) {
-      return true;
-    }
-    return _.contains(filter, filepath);
+    return (!filter) || _.contains(filter, filepath);
   };
 
   git.clone(url, function(err, git_dir) {

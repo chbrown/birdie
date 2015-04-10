@@ -147,7 +147,7 @@ Dependency.prototype.fetch = function(staticPattern, callback) {
     protocols.git.fetch(this.url, staticPattern, this.filter, callback);
   }
   else if (this.url.match(/^registry:/)) {
-    protocols.registry.fetch(this.url, this.version, staticPattern, callback);
+    protocols.registry.fetch(this.url, this.version, staticPattern, this.filter, callback);
   }
   else {
     var message = 'Protocol not recognized: ' + this.url;

@@ -109,7 +109,7 @@ var queryRegistry = function(name, version, callback) {
   });
 };
 
-var fetch = exports.fetch = function(url, version, staticPattern, callback) {
+var fetch = exports.fetch = function(url, version, staticPattern, filter, callback) {
   /** download all files and save them to the local filesystem using the given pattern.
 
   `callback`: function(Error | null)
@@ -120,6 +120,13 @@ var fetch = exports.fetch = function(url, version, staticPattern, callback) {
 
     // `files` is a hash from filenames to a list of urls, each of which _should_ respond with the same content.
     var filenames = Object.keys(files);
+    // if `filter` is specified, keep only the files that are named in `filter`
+    if (filter) {
+      filenames = filenames.filter(function(filename) {
+        return _.contains(filter, filename);
+      });
+    }
+
     async.each(filenames, function(filename, callback) {
       var urls = files[filename];
       // just use the first url, for now
