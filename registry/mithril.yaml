@@ -1,0 +1,10 @@
+---
+versions:
+  - 0.1.{3..34}
+
+$github: github://lhorie/mithril.js/v$version/$file
+
+files:
+  mithril.js: [$github]
+  mithril.min.js: [$github]
+  mithril.min.js.map: [$github]
