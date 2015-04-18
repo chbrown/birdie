@@ -35,6 +35,9 @@ Add resources to the newly created "staticDependencies" hash in your `package.js
       "staticDependencies": {
         "jquery": "2.0.0",
         "handlebars": "*",
+        "angular": {
+          "filter": ["angular.js", "angular.min.js"]
+        },
         "angular-translate": "git://github.com/angular-translate/bower-angular-translate.git",
         "tv4": {
           "url": "git://github.com/geraintluff/tv4.git",
