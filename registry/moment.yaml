@@ -17,6 +17,8 @@ versions:
   - 2.5.{0..1}
   - 2.6.0
   - 2.7.0
+  - 2.8.{0..4}
+  - 2.9.0
 
 $cdnjs: cdnjs://moment.js/$version/$file
 $github: github://moment/moment/$version/$file
