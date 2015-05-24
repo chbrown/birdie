@@ -32,9 +32,9 @@
     "underscore": "*"
   },
   "devDependencies": {
-    "tap": "*"
+    "mocha": "*"
   },
   "scripts": {
-    "test": "tap test"
+    "test": "mocha test"
   }
 }

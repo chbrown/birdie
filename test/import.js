@@ -1,8 +1,9 @@
-'use strict'; /*jslint node: true, es5: true, indent: 2 */
+/*globals describe, it */
 var birdy = require('..');
-var tap = require('tap');
+var assert = require('assert');
 
-tap.test('import', function(t) {
-  t.ok(birdy, 'birdy should load from test/.. directory');
-  t.end();
+describe('birdy', function() {
+  it('should be importable from parent directory', function() {
+    assert(birdy);
+  });
 });
