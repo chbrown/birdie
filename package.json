@@ -3,7 +3,7 @@
   "version": "0.6.12",
   "description": "Static asset anti-package management.",
   "author": "Christopher Brown <io@henrian.com>",
-  "homepage": "http://github.com/chbrown/birdy",
+  "homepage": "https://github.com/chbrown/birdy",
   "keywords": [
     "static",
     "asset",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/chbrown/birdy.git"
+    "url": "https://github.com/chbrown/birdy.git"
   },
   "bin": {
     "birdy": "bin/birdy.js"
