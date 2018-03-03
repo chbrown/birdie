@@ -14,19 +14,19 @@
   "license": "MIT",
   "repository": "git://github.com/chbrown/birdy.git",
   "dependencies": {
-    "async": "1.0.0",
-    "glob": "5.0.9",
-    "js-yaml": "3.3.1",
-    "loge": "0.0.3",
-    "minimatch": "2.0.8",
-    "mkdirp": "0.5.1",
-    "optimist": "0.6.1",
-    "request": "2.55.0",
-    "temp": "0.8.1",
-    "underscore": "1.8.3"
+    "async": "^2.6.0",
+    "glob": "^7.1.2",
+    "js-yaml": "^3.10.0",
+    "loge": "^0.0.3",
+    "minimatch": "^3.0.4",
+    "mkdirp": "^0.5.1",
+    "optimist": "^0.6.1",
+    "request": "^2.83.0",
+    "temp": "^0.8.3",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "mocha": "2.2.5"
+    "mocha": "^2.5.3"
   },
   "bin": {
     "birdy": "bin/birdy.js"
