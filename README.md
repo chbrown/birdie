@@ -1,5 +1,8 @@
 ## Birdy
 
+[![latest version published to npm](https://badge.fury.io/js/birdy.svg)](https://www.npmjs.com/package/birdy)
+[![Travis CI Build Status](https://travis-ci.org/chbrown/birdy.svg?branch=master)](https://travis-ci.org/chbrown/birdy)
+
 Birdy is a fast, fine-grained static asset management tool.
 It intends to replace [bower](https://github.com/bower/bower) for common uses,
 although it is not as flexible (it does not include the kitchen sink).
@@ -98,6 +101,7 @@ But I led with `package.json` because that's the sane way.
 
 Run `birdy --help` to see what flags to use.
 
+
 ## resources/*
 
 Every resource is an arbitrary javascript file that exposes a function as `module.exports`.
@@ -127,9 +131,6 @@ Function signature:
 
 The callback is not guaranteed to be async (e.g., `setImmediate` or requiring some fetch).
 
-## Tests
-
-**Travis CI Build Status**: [![Travis CI Build Status](https://api.travis-ci.org/chbrown/birdy.png)](https://travis-ci.org/chbrown/birdy)
 
 ### Contributing
 
@@ -139,6 +140,7 @@ Before you send a pull request, please verify that:
 
 1. Your addition is not a duplicate of an existing resource.
 2. Someone else might conceivably want to use the resource you are submitting.
+
 
 ## To-do
 
@@ -169,6 +171,8 @@ Before you send a pull request, please verify that:
 <!-- 1. http://stackoverflow.com/questions/2466735/checkout-only-one-file-from-git -->
 <!-- 2. http://schacon.github.io/git/git-read-tree.html#_sparse_checkout -->
 
+
 ## License
 
-Copyright © 2013 Christopher Brown. [MIT Licensed](LICENSE).
+Copyright © 2013 Christopher Brown.
+[MIT Licensed](https://chbrown.github.io/licenses/MIT/#2013).
