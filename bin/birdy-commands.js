@@ -1,5 +1,3 @@
-'use strict'; /*jslint node: true, es5: true, indent: 2 */
-var _ = require('underscore');
 var async = require('async');
 var fs = require('fs');
 var path = require('path');
@@ -10,7 +8,7 @@ var birdy = require('..');
 var Dependency = require('../dependency');
 var config = require('../config');
 
-exports.init = function(argv) {
+function init(argv) {
   // the first argument was the command. the others are dependencies
   config.read(argv.config, argv.staticPattern, argv._.slice(1), function(err, dependencies, pattern, package_object) {
     if (err) return logger.error('config.read error:', err);
@@ -28,10 +26,11 @@ exports.init = function(argv) {
       logger.info('Wrote "%s"', argv.config);
     });
   });
-};
+}
+exports.init = init;
 
-exports.install = function(argv) {
-  config.read(argv.config, argv.staticPattern, argv._.slice(1), function(err, dependency_list, pattern, package_object) {
+function install(argv) {
+  config.read(argv.config, argv.staticPattern, argv._.slice(1), function(err, dependency_list, pattern) { // (err, dependency_list, pattern, package_object)
     // todo: check for --save flag and writeFile like in init?
     // logger.debug('Dependencies:', dependency_list.dependencies);
 
@@ -41,9 +40,10 @@ exports.install = function(argv) {
       logger.info('Done installing');
     });
   });
-};
+}
+exports.install = install;
 
-exports.search = function(argv) {
+function search(argv) {
   var query = argv._.slice(1).join(' ');
   var resources_dirpath = path.normalize(path.join(__dirname, '..', 'resources'));
   var resources_glob = query ? ('*' + query + '*.js') : '*.js';
@@ -69,7 +69,9 @@ exports.search = function(argv) {
         callback(err);
       });
     }, function(err) {
+      if (err) logger.error(err);
       logger.debug('Done searching.');
     });
   });
-};
+}
+exports.search = search;

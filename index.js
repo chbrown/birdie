@@ -1,16 +1,19 @@
-'use strict'; /*jslint node: true, es5: true, indent: 2 */
 var async = require('async');
 
-var dependency = require('./dependency');
-var Dependency = exports.Dependency = dependency.Dependency;
-var DependencyList = exports.DependencyList = dependency.DependencyList;
+var {Dependency, DependencyList} = require('./dependency');
 
-exports.install = function(dependency_list, pattern, callback) {
+function install(dependency_list, pattern, callback) {
+  var dependencies;
   if (dependency_list instanceof DependencyList) {
-    dependency_list = dependency_list.dependencies;
+    dependencies = dependency_list.dependencies;
+  }
+  else {
+    dependencies = dependency_list;
   }
 
-  async.each(dependency_list, function(dependency, callback) {
+  async.each(dependencies, function(dependency, callback) {
     dependency.fetch(pattern, callback);
   }, callback);
-};
+}
+
+module.exports = {Dependency, DependencyList, install};

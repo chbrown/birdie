@@ -1,25 +1,24 @@
-'use strict'; /*jslint node: true, es5: true, indent: 2 */
-var _ = require('underscore');
-
 var json = require('./lib/json');
-var DependencyList = require('./dependency').DependencyList;
+var {DependencyList} = require('./dependency');
 
-var defaults = exports.defaults = {
-  staticPattern: 'static/{resource}/{file}'
+var defaults = {
+  staticPattern: 'static/{resource}/{file}',
 };
+exports.defaults = defaults;
 
-var read = exports.read = function(package_filepath, cli_pattern, cli_strings, callback) {
-  /** Combine package.json and pattern/dependencies specified in the CLI command
+/**
+Combine package.json and pattern/dependencies specified in the CLI command
 
-  package_filepath: String
-  cli_pattern: String | undefined
-  cli_strings: [String]
-  callback: function(Error) | function(null, dependencies, pattern, package_object)
-    dependencies: DependencyList
-    pattern: String
-    package_object: Object
-      The package.json representation, if available, or {}.
-  */
+package_filepath: String
+cli_pattern: String | undefined
+cli_strings: [String]
+callback: function(Error) | function(null, dependencies, pattern, package_object)
+  dependencies: DependencyList
+  pattern: String
+  package_object: Object
+    The package.json representation, if available, or {}.
+*/
+function read(package_filepath, cli_pattern, cli_strings, callback) {
   json.readFile(package_filepath, {}, function(err, config) {
     if (err) return callback(err);
 
@@ -37,4 +36,5 @@ var read = exports.read = function(package_filepath, cli_pattern, cli_strings, c
 
     callback(null, dependencies, pattern, config);
   });
-};
+}
+exports.read = read;

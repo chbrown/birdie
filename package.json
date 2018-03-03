@@ -12,27 +12,24 @@
     "curated"
   ],
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/chbrown/birdy.git"
+  "repository": "git://github.com/chbrown/birdy.git",
+  "dependencies": {
+    "async": "1.0.0",
+    "glob": "5.0.9",
+    "js-yaml": "3.3.1",
+    "loge": "0.0.3",
+    "minimatch": "2.0.8",
+    "mkdirp": "0.5.1",
+    "optimist": "0.6.1",
+    "request": "2.55.0",
+    "temp": "0.8.1",
+    "underscore": "1.8.3"
+  },
+  "devDependencies": {
+    "mocha": "2.2.5"
   },
   "bin": {
     "birdy": "bin/birdy.js"
-  },
-  "dependencies": {
-    "async": "*",
-    "glob": "*",
-    "js-yaml": "*",
-    "loge": "*",
-    "minimatch": "*",
-    "mkdirp": "*",
-    "optimist": "*",
-    "request": "*",
-    "temp": "*",
-    "underscore": "*"
-  },
-  "devDependencies": {
-    "mocha": "*"
   },
   "scripts": {
     "test": "mocha test"

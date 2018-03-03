@@ -1,9 +1,6 @@
-'use strict'; /*jslint node: true, es5: true, indent: 2 */
 var _ = require('underscore');
 var async = require('async');
 var fs = require('fs');
-var glob = require('glob');
-var minimatch = require('minimatch');
 var path = require('path');
 var request = require('request');
 var logger = require('loge');
@@ -14,19 +11,18 @@ var versions = require('../versions');
 
 function escapeRegExp(string){
   // from MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-  return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+  return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
 }
 
-var replaceByKeys = function(string, ctx) {
+function replaceByKeys(string, ctx) {
   var regex = new RegExp(Object.keys(ctx).map(escapeRegExp).join('|'), 'g');
   // console.log('replaceByKeys', regex, '~=', string, string.match(regex));
   return string.replace(regex, function(match) {
     return ctx[match];
   });
-};
+}
 
-var set_re = /^\$\w+$/g;
-var interpolate = function(obj, ctx) {
+function interpolate(obj, ctx) {
   if (_.isArray(obj)) {
     return obj.map(function(item) {
       return interpolate(item, ctx);
@@ -47,7 +43,7 @@ var interpolate = function(obj, ctx) {
   else {
     return obj;
   }
-};
+}
 
 var psuedo_protocols = {
   // github is really nice in that it exposes all files on all branches/tags over http and https at unique urls. so great!
@@ -57,12 +53,12 @@ var psuedo_protocols = {
   'ms:/': 'http://ajax.aspnetcdn.com',
 };
 
-var download = function(url, filepath, callback) {
-  /**
-  callback: function(Error | null)
-  */
+/**
+callback: function(Error | null)
+*/
+function download(url, filepath, callback) {
   var real_url = replaceByKeys(url, psuedo_protocols);
-    // set encoding: null so that we get a buffer back as the body.
+  // set encoding: null so that we get a buffer back as the body.
   request({url: real_url, encoding: null}, function(err, response, body) {
     if (err) return callback(err);
     if (response.statusCode != 200) {
@@ -77,9 +73,9 @@ var download = function(url, filepath, callback) {
       callback();
     });
   });
-};
+}
 
-var queryRegistry = function(name, version, callback) {
+function queryRegistry(name, version, callback) {
   // callback: function(Error | null, files: Object | null)
   var yaml_filepath = path.join(__dirname, '..', 'registry', name + '.yaml');
   fs.readFile(yaml_filepath, {encoding: 'utf8'}, function(err, data) {
@@ -107,13 +103,13 @@ var queryRegistry = function(name, version, callback) {
     }
     callback(null, files);
   });
-};
+}
 
-var fetch = exports.fetch = function(url, version, staticPattern, filter, callback) {
-  /** download all files and save them to the local filesystem using the given pattern.
+/** download all files and save them to the local filesystem using the given pattern.
 
-  `callback`: function(Error | null)
-  */
+`callback`: function(Error | null)
+*/
+function fetch(url, version, staticPattern, filter, callback) {
   var registry_name = url.match(/registry:\/\/(.+)/)[1];
   queryRegistry(registry_name, version, function(err, files) {
     if (err) return callback(err);
@@ -141,4 +137,5 @@ var fetch = exports.fetch = function(url, version, staticPattern, filter, callba
       });
     }, callback);
   });
-};
+}
+exports.fetch = fetch;

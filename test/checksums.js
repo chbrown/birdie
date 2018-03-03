@@ -19,9 +19,9 @@ function md5(filepath) {
 describe('registry', function() {
   it('should pull down sources with correct checksums', function(callback) {
     var list = birdy.DependencyList.parse({
-      'angular': '1.2.8',
-      'jquery': '2.0.3',
-      'underscore': '1.5.2',
+      angular: '1.2.8',
+      jquery: '2.0.3',
+      underscore: '1.5.2',
     });
 
     temp.mkdir(null, function(err, dir_path) {

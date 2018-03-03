@@ -1,4 +1,3 @@
-'use strict'; /*jslint node: true, es5: true, indent: 2 */
 var _ = require('underscore');
 
 var Range = function(begin, end) {
@@ -59,7 +58,9 @@ Version.merge = function(versions) {
   return result;
 };
 Version.prototype.toString = function() {
-  return this.ranges.map(function(range) { return range.toString(); }).join('.');
+  return this.ranges.map(function(range) {
+    return range.toString();
+  }).join('.');
 };
 
 function expandEach(version) {
@@ -74,11 +75,12 @@ function expandEach(version) {
   return [version];
 }
 
-var expand = exports.expand = function(versions) {
+function expand(versions) {
   return Array.prototype.concat.apply([], versions.map(expandEach));
-};
+}
+exports.expand = expand;
 
-var collapse = exports.collapse = function(versions) {
+function collapse(versions) {
   // given a list of expanded versions, provide list of collapsed representations
   // _.flatten(expand, true)
   var result = [];
@@ -98,4 +100,5 @@ var collapse = exports.collapse = function(versions) {
   });
   result.push(buffer.toString());
   return result;
-};
+}
+exports.collapse = collapse;

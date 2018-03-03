@@ -1,7 +1,5 @@
-'use strict'; /*jslint node: true, es5: true, indent: 2 */
 var _ = require('underscore');
 var async = require('async');
-var fs = require('fs');
 var glob = require('glob');
 var minimatch = require('minimatch');
 var path = require('path');
@@ -19,16 +17,16 @@ function isVersionControl(filepath) {
   return filepath.match(/^(\.git|\.hg|\.svn|\.bzr|_darcs|CVS)/);
 }
 
-var fetch = exports.fetch = function(url, staticPattern, filter, callback) {
-  /**
-  1. Clone a remote git repository to a temporary directory,
-  2. Copy the files over from the temporary location.
+/**
+1. Clone a remote git repository to a temporary directory,
+2. Copy the files over from the temporary location.
 
-  filter: Array | null
-    If not null, only allow files that occur in `filter`
+filter: Array | null
+  If not null, only allow files that occur in `filter`
 
-  TODO: cleanup after finishing the download.
-  */
+TODO: cleanup after finishing the download.
+*/
+function fetch(url, staticPattern, filter, callback) {
   var isSelected = function(filepath) {
     return (!filter) || _.contains(filter, filepath);
   };
@@ -58,15 +56,15 @@ var fetch = exports.fetch = function(url, staticPattern, filter, callback) {
         if (err) return callback(err);
 
         var files = _.chain(matches)
-          // filter out directories
-          .reject(isDirectory)
-          // and typical source repository folders
-          .reject(isVersionControl)
-          // and things that match the staticIgnore flag in the target package
-          .reject(isIgnored)
-          // but only keep files matching filter, if `filter` is specified
-          .select(isSelected)
-          .value();
+        // filter out directories
+        .reject(isDirectory)
+        // and typical source repository folders
+        .reject(isVersionControl)
+        // and things that match the staticIgnore flag in the target package
+        .reject(isIgnored)
+        // but only keep files matching filter, if `filter` is specified
+        .select(isSelected)
+        .value();
 
         // files is a list of partial filepaths (i.e., files in directories, but not absolute)
         async.each(files, function(file, callback) {
@@ -82,4 +80,5 @@ var fetch = exports.fetch = function(url, staticPattern, filter, callback) {
       });
     });
   });
-};
+}
+exports.fetch = fetch;
